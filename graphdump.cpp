@@ -6,17 +6,15 @@
 #include <ctime>
 
 
-int main(int argc, char** argv)
+void usageHelp()
 {
-	if (argc == 1)
-	{
-		std::cout << "No file to parse specified" << std::endl;
-		return -1;
-	}
-	
-	std::string fl = argv[1];
+	std::cout << "Usage:\t./graphdump import <export file>" << std::endl;
+	std::cout << "\t./graphdump export <source file> <export file>" << std::endl;
+}
 
-	Parser p(fl);
+void exporter(std::string flsrc, std::string flexp)
+{
+	Parser p(flsrc);
 
 	std::cout << "Starting" << std::endl;
 	std::time_t result = std::time(nullptr);
@@ -31,13 +29,68 @@ int main(int argc, char** argv)
 
 	Graph test;
 
-	//test.buildGraph(p.getContainer());
+	test.buildGraph(p.getContainer());
 
-	//TODO: this
-	//test.export();
+	test.save(flexp);
 
 	result = std::time(nullptr);
 	std::cout << std::asctime(std::localtime(&result)) << std::endl;
+	std::cout << "Finished!" << std::endl;
 
-	return 0;
+}
+
+void importer(std::string flname)
+{
+	Graph imported;
+
+	imported.load(flname);
+
+	std::cout << "Loaded succesfully!" << std::endl;
+
+	int size = imported.getAmount();
+
+	while(1)
+	{
+		std::cout << "Total amount of packages: " << size << std::endl;
+		std::cout << "Print number of package to get info: ";
+		int index;
+		std::cin >> index;
+		std::cout << std::endl << imported[index].getFullInfo() << std::endl;
+	}
+}
+
+int main(int argc, char** argv)
+{
+	if (argc < 3)
+	{
+		usageHelp();
+		return -1;
+	}
+	
+	std::string option = argv[1];
+	std::string fl = argv[2];
+
+	if (option == "export")
+	{
+		if (argc != 4)
+		{
+			std::cout << "Export file unspecified!" << std::endl;
+			usageHelp();
+			return -1;
+		}
+
+		std::string flexp = argv[3];
+		exporter(fl, flexp);
+		return 0;
+	}
+	if (option == "import")
+	{
+		importer(fl);
+		return 0;
+	}
+
+	std::cout << "Unknown option: " << option << std::endl;
+	usageHelp();
+	
+	return -1;
 }

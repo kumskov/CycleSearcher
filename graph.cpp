@@ -1,14 +1,5 @@
 #include "graph.hpp"
 
-//##################################################//
-//													//
-//					GraphNode						//
-//													//
-//##################################################//
-
-//Nothing is needed anymore. GraphNode is now a subclass
-//of Graph
-
 
 //##################################################//
 //													//
@@ -84,6 +75,7 @@ void Graph::fillRequires()
 				_ingraph[i]._brokenDep = true;
 				//std::string exmsg = "Graph: failed to find anyone providing <" + reqs[j] + "> for <" + _ingraph[i]._pkg.getName() + ">\n";
 				//throw std::runtime_error(exmsg);
+				
 				std::cout << "Nobody provides <" << reqs[j] << "> for <" << _ingraph[i]._pkg.getName() << ">\n"; 
 			}
 			else
@@ -144,9 +136,10 @@ bool Graph::inGraph(const Package cmp) const
 
 const Package& Graph::operator[] (int index) const
 {
-	if (index >= _ingraph.size())
+	if ((index >= _ingraph.size()) ||
+		(index < 0))
 	{
-		throw std::logic_error("Graph: Tried to request index higher than amount of elements");
+		throw std::logic_error("Graph: Tried to request invalid index");
 	}
 
 	return _ingraph[index]._pkg;
@@ -214,4 +207,114 @@ std::string Graph::printInfo(int index) const
 	
 	return ret;
 	
+}
+
+void Graph::writeNode(std::ofstream& out, const GraphNode& node) const
+{
+	out << "node" << std::endl;
+	out << node._pkg;
+	out << "broken " << node._brokenDep << std::endl;
+	out << "reqindex " << node._requires.size() << std::endl;
+	for (int i = 0; i < node._requires.size(); ++i)
+	{
+		out << node._requires[i] << ' ';
+	}
+	out << std::endl;
+	out << "provindex " << node._providesFor.size() << std::endl;
+	for (int i = 0; i < node._providesFor.size(); ++i)
+	{
+		out << node._providesFor[i] << ' ';
+	}
+	out << std::endl;
+}
+
+Graph::GraphNode Graph::readNode(std::ifstream& in) const
+{
+	Graph::GraphNode ret;
+	std::string checker = "";
+	in >> checker;
+	if (checker != "node")
+	{
+		throw std::runtime_error("Graph input: Failed to read node header");
+	}
+	in >> ret._pkg;
+
+	in >> checker;
+	if (checker != "broken")
+	{
+		throw std::runtime_error("Graph input: Failed to read brokendep header");
+	}
+	in >> ret._brokenDep;
+
+	in >> checker;
+	if (checker != "reqindex")
+	{
+		throw std::runtime_error("Graph input: Failed to read require index header");
+	}
+	int reqamount = 0;
+	in >> reqamount;
+	for (int i = 0; i < reqamount; ++i)
+	{
+		int val = 0;
+		in >> val;
+		ret._requires.push_back(val);
+	}
+
+	in >> checker;
+	if (checker != "provindex")
+	{
+		throw std::runtime_error("Graph input: Failed to read provide index header");
+	}
+	int provamount = 0;
+	in >> provamount;
+	for (int i = 0; i < provamount; ++i)
+	{
+		int val = 0;
+		in >> val;
+		ret._providesFor.push_back(val);
+	}
+
+
+	return ret;
+}
+
+void Graph::save(std::string flname) const
+{
+	std::ofstream fl;
+	fl.open(flname.c_str(), std::ofstream::out);
+
+	fl << "graph" << std::endl;
+	fl << "grsize " << _ingraph.size() << std::endl;
+	for (int i = 0; i < _ingraph.size(); ++i)
+	{
+		writeNode(fl, _ingraph[i]);
+	}
+
+	fl.close();
+}
+
+void Graph::load(std::string flname)
+{
+	std::ifstream fl;
+	fl.open(flname.c_str(), std::ifstream::in);
+
+	std::string checker;
+	fl >> checker;
+	if (checker != "graph")
+	{
+		throw std::runtime_error("Graph input: Failed to read graph header");
+	}
+	fl >> checker;
+	if (checker != "grsize")
+	{
+		throw std::runtime_error("Graph input: Failed to read graph size header");
+	}
+	int nodeamount = 0;
+	fl >> nodeamount;
+	for (int i = 0; i < nodeamount; ++i)
+	{
+		_ingraph.push_back(readNode(fl));
+	}
+
+	fl.close();
 }
