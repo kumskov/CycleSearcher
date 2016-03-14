@@ -76,7 +76,7 @@ void Graph::fillRequires()
 				//std::string exmsg = "Graph: failed to find anyone providing <" + reqs[j] + "> for <" + _ingraph[i]._pkg.getName() + ">\n";
 				//throw std::runtime_error(exmsg);
 				
-				std::cout << "Nobody provides <" << reqs[j] << "> for <" << _ingraph[i]._pkg.getName() << ">\n"; 
+				//std::cout << "Nobody provides <" << reqs[j] << "> for <" << _ingraph[i]._pkg.getName() << ">\n"; 
 			}
 			else
 			{
@@ -88,11 +88,11 @@ void Graph::fillRequires()
 		if (_ingraph[i]._requires.size() != _ingraph[i]._pkg.getReqAmount())
 		{
 			//throw std::runtime_error("One of the package requirements could not be resolved propely");
-			std::cout << "Req " << i << ": something went horribly wrong" << std::endl;
+			//std::cout << "Req " << i << ": something went horribly wrong" << std::endl;
 		}
 		else
 		{
-			std::cout << "Req " << i << ": All Good!" << std::endl;
+			//std::cout << "Req " << i << ": All Good!" << std::endl;
 		}
 	}
 }
@@ -116,7 +116,7 @@ void Graph::fillProvidesFor()
 				_ingraph[i]._providesFor.push_back(provindex);
 			}
 		}
-		std::cout << "Prov " << i << ": done\n";
+		//std::cout << "Prov " << i << ": done\n";
 	}
 }
 
@@ -145,6 +145,7 @@ const Package& Graph::operator[] (int index) const
 	return _ingraph[index]._pkg;
 }
 
+/*
 void Graph::debugPrintNodeVectors(int index) const
 {
 	Graph::GraphNode tmp = _ingraph[index];
@@ -165,6 +166,7 @@ void Graph::debugPrintNodeVectors(int index) const
 		std::cout << "\t " << tmp._providesFor[i] << std::endl;
 	}
 }
+*/
 
 std::string Graph::printInfo(int index) const
 {
@@ -288,6 +290,7 @@ void Graph::save(std::string flname) const
 	for (int i = 0; i < _ingraph.size(); ++i)
 	{
 		writeNode(fl, _ingraph[i]);
+		//std::cout << "Graph export: written " << i << std::endl;
 	}
 
 	fl.close();
