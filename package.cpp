@@ -172,3 +172,79 @@ std::string Package::getName() const
 {
 	return _name;
 }
+
+//Format as followpkg.s:
+//
+//pkg
+//pkgname
+//pkgdesc
+//provides 3
+//pkgprov1 pkgprov2 pkgprov3
+//requires 2
+//req1 req2
+//
+//This same format is used for reading
+std::ofstream &operator << (std::ofstream& in, const Package& pkg)
+{
+	in << "pkg" << std::endl;
+	in << pkg._name << std::endl << pkg._desc << std::endl;
+	in << "provides" << ' ' << pkg._provides.size() << std::endl;
+	for (int i = 0; i < pkg._provides.size(); ++i)
+	{
+		in << pkg._provides[i] << ' ';
+	}
+	in << "requires" << ' ' << pkg._requires.size() << std::endl;
+	for (int i = 0; i < pkg._requires.size(); ++i)
+	{
+		in << pkg._requires[i] << ' ';
+	}
+	in << std::endl;
+	return in;
+}
+
+std::ifstream &operator >> (std::ifstream& out, Package& pkg)
+{
+	std::string checker;
+	out >> checker;
+	if (checker != "pkg")
+	{
+		throw std::runtime_error("Package import: Invalid header");
+	}
+
+	out >> checker;
+	pkg._name = checker;
+	std::getline(out, checker);
+	std::getline(out, checker);
+	pkg._desc = checker;
+
+	out >> checker;
+	if (checker != "provides")
+	{
+		throw std::runtime_error("Package import: failed to read provides header");
+	}
+
+	int provcount;
+	out >> provcount;
+	for (int i = 0; i < provcount; ++i)
+	{
+		out >> checker;
+		pkg._provides.push_back(checker);
+	}
+
+	out >> checker;
+	if (checker != "requires")
+	{
+		throw std::runtime_error("Package import: failed to read requreq header");
+	}
+
+	int reqcount;
+	out >> reqcount;
+	for (int i = 0; i < reqcount; ++i)
+	{
+		out >> checker;
+		pkg._requires.push_back(checker);
+	}
+
+
+	return out;
+}
