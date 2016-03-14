@@ -41,9 +41,16 @@ void exporter(std::string flsrc, std::string flexp)
 
 void importer(std::string flname)
 {
+	std::cout << "Starting" << std::endl;
+	std::time_t result = std::time(nullptr);
+	std::cout << std::asctime(std::localtime(&result)) << std::endl;
+
 	Graph imported;
 
 	imported.load(flname);
+
+	result = std::time(nullptr);
+	std::cout << std::asctime(std::localtime(&result)) << std::endl;
 
 	std::cout << "Loaded succesfully!" << std::endl;
 
@@ -55,7 +62,7 @@ void importer(std::string flname)
 		std::cout << "Print number of package to get info: ";
 		int index;
 		std::cin >> index;
-		std::cout << std::endl << imported[index].getFullInfo() << std::endl;
+		std::cout << std::endl << imported.printInfo(index) << std::endl;
 	}
 }
 
