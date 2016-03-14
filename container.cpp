@@ -18,9 +18,10 @@ int Container::size() const
 
 const Package& Container::operator[] (int index) const
 {
-	if (index >= _pkgs.size())
+	if ((index >= _pkgs.size()) ||
+		(index < 0))
 	{
-		throw std::logic_error("Container: Tried to request index higher than amount of elements");
+		throw std::logic_error("Container: Tried to request invalid index");
 	}
 
 	return _pkgs[index];

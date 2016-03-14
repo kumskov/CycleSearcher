@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include "package.hpp"
 
+//Basicly a vector with find methods
 class Container
 {
 protected:
