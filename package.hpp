@@ -41,7 +41,7 @@ public:
 	bool operator == (const Package &) const;
 
 	friend std::ofstream &operator << (std::ofstream &, const Package &);
-	friend std::ifstream &operator >> (std::ifstream &, const Package &);
+	friend std::ifstream &operator >> (std::ifstream &, Package &);
 };
 
 
