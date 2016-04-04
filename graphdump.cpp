@@ -2,6 +2,7 @@
 #include "package.hpp"
 #include "container.hpp"
 #include "graph.hpp"
+#include "cyclesearcher.hpp"
 #include <iostream>
 #include <ctime>
 
@@ -37,12 +38,14 @@ void exporter(std::string flsrc, std::string flexp)
 	std::cout << "Finished: \t" << std::asctime(std::localtime(&result));
 }
 
-void exporterHelp()
+void importerHelp()
 {
 	std::cout << "help";
 	std::cout << "\t print all available commands" << std::endl;
 	std::cout << "index";
-	std::cout << "\t print package at specified index" << std::endl;
+	std::cout << "\t print full package and dep info at specified index" << std::endl;
+	std::cout << "simple";
+	std::cout << "\t print package with primitive deps" << std::endl;
 	std::cout << "find";
 	std::cout << "\t find all packages with specified string" << std::endl;
 	std::cout << "size";
@@ -73,7 +76,7 @@ void importer(std::string flname)
 		std::cin >> param;
 		if (param == "help")
 		{
-			exporterHelp();
+			importerHelp();
 			continue;
 		}
 		if (param == "index")
@@ -81,6 +84,13 @@ void importer(std::string flname)
 			int index;
 			std::cin >> index;
 			std::cout << std::endl << imported.printInfo(index) << std::endl;
+			continue;
+		}
+		if (param == "simple")
+		{
+			int index;
+			std::cin >> index;
+			std::cout << std::endl << imported[index].getFullInfo() << std::endl;
 			continue;
 		}
 		if (param == "exit")
@@ -131,6 +141,33 @@ void fixer(std::string flsrc, std::string flexp)
 	std::cout  <<"Finished: \t" << std::asctime(std::localtime(&result));
 }
 
+void cycler(std::string flname)
+{
+	std::time_t result = std::time(nullptr);
+	std::cout << "Starting: \t" << std::asctime(std::localtime(&result));
+
+	CycleSearcher worker;
+
+	worker.load(flname);
+
+	result = std::time(nullptr);
+	std::cout << "Loaded: \t" << std::asctime(std::localtime(&result));
+
+	int size = worker.getAmount();
+	std::cout << "Total amount of packages: " << size << std::endl;
+
+	worker.findCycles();
+
+	std::cout << worker.cycleAmount() << " cycles total" << std::endl;
+	while(1)
+	{
+		std::cout << "Input what cycle to print: ";
+		int index;
+		std::cin >> index;
+		std::cout << worker.cycleToString(index) << std::endl;
+	}
+}
+
 int main(int argc, char** argv)
 {
 	if (argc < 3)
@@ -158,6 +195,11 @@ int main(int argc, char** argv)
 	if (option == "import")
 	{
 		importer(fl);
+		return 0;
+	}
+	if (option == "cycle")
+	{
+		cycler(fl);
 		return 0;
 	}
 	if (option == "fix")
