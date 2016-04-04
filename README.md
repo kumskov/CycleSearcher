@@ -2,6 +2,6 @@
 
 Use 'make all' to compile everything.
 
-graphdump exports built graph to text file
+graphdump is used for mostly everything, including tests. It is also self-explanatory.
 
-test is for all tests and other garbage
+export function of graphdump has already been used to generate synt.dump, use it for importer function of graphdump. Cycler function is test for cycle search. It doesn't work properly yet.
