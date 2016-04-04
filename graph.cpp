@@ -154,6 +154,20 @@ bool Graph::inGraph(const Package cmp) const
 	return false;
 }
 
+std::vector<int> Graph::find(const std::string name) const
+{
+	std::vector<int> ret;
+	for (int i = 0; i < _ingraph.size(); ++i)
+	{
+		if (_ingraph[i]._pkg.getName().find(name) != std::string::npos)
+		{
+			ret.push_back(i);
+		}
+	}
+
+	return ret;
+}
+
 const Package& Graph::operator[] (int index) const
 {
 	if ((index >= _ingraph.size()) ||

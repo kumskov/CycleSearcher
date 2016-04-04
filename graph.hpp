@@ -55,6 +55,8 @@ public:
 	int getAmount() const;
 	bool inGraph(const Package) const;
 
+	std::vector<int> find(const std::string) const;
+
 	const Package& operator[](int) const;
 
 	std::string printInfo(int index) const;
