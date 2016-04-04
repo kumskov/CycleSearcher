@@ -10,22 +10,22 @@ void usageHelp()
 {
 	std::cout << "Usage:\t./graphdump import <export file>" << std::endl;
 	std::cout << "\t./graphdump export <source file> <export file>" << std::endl;
+	std::cout << "\t./graphdump fix <source file> <export file>" << std::endl;
 }
 
 void exporter(std::string flsrc, std::string flexp)
 {
 	Parser p(flsrc);
 
-	std::cout << "Starting" << std::endl;
 	std::time_t result = std::time(nullptr);
-	std::cout << std::asctime(std::localtime(&result)) << std::endl;
+	std::cout << std::asctime(std::localtime(&result)) << ": Starting" << std::endl;
 
 	p.parse();
 
 	int size = p.getAmountOfPackages();
 
 	Container c = p.getContainer();
-	std::cout << size << std::endl;
+	std::cout << "Amount of elements:" << size << std::endl;
 
 	Graph test;
 
@@ -34,25 +34,20 @@ void exporter(std::string flsrc, std::string flexp)
 	test.save(flexp);
 
 	result = std::time(nullptr);
-	std::cout << std::asctime(std::localtime(&result)) << std::endl;
-	std::cout << "Finished!" << std::endl;
-
+	std::cout << std::asctime(std::localtime(&result)) << ": Finished" << std::endl;
 }
 
 void importer(std::string flname)
 {
-	std::cout << "Starting" << std::endl;
 	std::time_t result = std::time(nullptr);
-	std::cout << std::asctime(std::localtime(&result)) << std::endl;
+	std::cout << std::asctime(std::localtime(&result)) << ": Starting" << std::endl;
 
 	Graph imported;
 
 	imported.load(flname);
 
 	result = std::time(nullptr);
-	std::cout << std::asctime(std::localtime(&result)) << std::endl;
-
-	std::cout << "Loaded succesfully!" << std::endl;
+	std::cout << std::asctime(std::localtime(&result)) << ": Loaded succesfully!" << std::endl;
 
 	int size = imported.getAmount();
 
@@ -64,6 +59,28 @@ void importer(std::string flname)
 		std::cin >> index;
 		std::cout << std::endl << imported.printInfo(index) << std::endl;
 	}
+}
+
+void fixer(std::string flsrc, std::string flexp)
+{
+	std::time_t result = std::time(nullptr);
+	std::cout << std::asctime(std::localtime(&result)) << ": Starting" << std::endl;
+
+	Graph imported;
+
+	imported.load(flsrc);
+
+	result = std::time(nullptr);
+	std::cout << std::asctime(std::localtime(&result)) << ": Loaded succesfully!" << std::endl;
+
+	imported.cleanDuplicates();
+
+	std::cout << std::asctime(std::localtime(&result)) << ": Fixed succesfully!" << std::endl;
+
+	imported.save(flexp);
+
+	result = std::time(nullptr);
+	std::cout << std::asctime(std::localtime(&result)) << ": Finished!" << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -81,7 +98,7 @@ int main(int argc, char** argv)
 	{
 		if (argc != 4)
 		{
-			std::cout << "Export file unspecified!" << std::endl;
+			std::cout << "Not enough parameters!" << std::endl;
 			usageHelp();
 			return -1;
 		}
@@ -93,6 +110,19 @@ int main(int argc, char** argv)
 	if (option == "import")
 	{
 		importer(fl);
+		return 0;
+	}
+	if (option == "fix")
+	{
+		if (argc != 4)
+		{
+			std::cout << "Not enough parameters!" << std::endl;
+			usageHelp();
+			return -1;
+		}
+
+		std::string flexp = argv[3];
+		fixer(fl, flexp);
 		return 0;
 	}
 
