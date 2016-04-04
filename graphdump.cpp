@@ -18,7 +18,7 @@ void exporter(std::string flsrc, std::string flexp)
 	Parser p(flsrc);
 
 	std::time_t result = std::time(nullptr);
-	std::cout << std::asctime(std::localtime(&result)) << ": Starting" << std::endl;
+	std::cout << "Starting: \t" << std::asctime(std::localtime(&result));
 
 	p.parse();
 
@@ -34,53 +34,101 @@ void exporter(std::string flsrc, std::string flexp)
 	test.save(flexp);
 
 	result = std::time(nullptr);
-	std::cout << std::asctime(std::localtime(&result)) << ": Finished" << std::endl;
+	std::cout << "Finished: \t" << std::asctime(std::localtime(&result));
+}
+
+void exporterHelp()
+{
+	std::cout << "help";
+	std::cout << "\t print all available commands" << std::endl;
+	std::cout << "index";
+	std::cout << "\t print package at specified index" << std::endl;
+	std::cout << "find";
+	std::cout << "\t find all packages with specified string" << std::endl;
+	std::cout << "size";
+	std::cout << "\t print total amount of packages" << std::endl;
+	std::cout << "exit";
+	std::cout << "\t finish working with graph" << std::endl;
 }
 
 void importer(std::string flname)
 {
 	std::time_t result = std::time(nullptr);
-	std::cout << std::asctime(std::localtime(&result)) << ": Starting" << std::endl;
+	std::cout << "Starting: \t" << std::asctime(std::localtime(&result));
 
 	Graph imported;
 
 	imported.load(flname);
 
 	result = std::time(nullptr);
-	std::cout << std::asctime(std::localtime(&result)) << ": Loaded succesfully!" << std::endl;
+	std::cout << "Loaded: \t" << std::asctime(std::localtime(&result));
 
 	int size = imported.getAmount();
+	std::cout << "Total amount of packages: " << size << std::endl;
 
 	while(1)
 	{
-		std::cout << "Total amount of packages: " << size << std::endl;
-		std::cout << "Print number of package to get info: ";
-		int index;
-		std::cin >> index;
-		std::cout << std::endl << imported.printInfo(index) << std::endl;
+		std::cout << "cmd: ";
+		std::string param;
+		std::cin >> param;
+		if (param == "help")
+		{
+			exporterHelp();
+			continue;
+		}
+		if (param == "index")
+		{
+			int index;
+			std::cin >> index;
+			std::cout << std::endl << imported.printInfo(index) << std::endl;
+			continue;
+		}
+		if (param == "exit")
+		{
+			return;
+		}
+		if (param == "size")
+		{
+			std::cout << "Total amount of packages: " << size << std::endl;
+			continue;
+		}
+		if (param == "find")
+		{
+			std::string findstr;
+			std::cin >> findstr;
+			std::vector<int> found = imported.find(findstr);
+			for (int j = 0; j < found.size(); ++j)
+			{
+				std::cout << found[j] << ": " << imported[found[j]].getName() << std::endl;
+			}
+			continue;
+		}
+		std::cout << "Unknown command: " << param << std::endl;
+		std::cout << "Type \"help\" to list all available commands" << std::endl;
+		
 	}
 }
 
 void fixer(std::string flsrc, std::string flexp)
 {
 	std::time_t result = std::time(nullptr);
-	std::cout << std::asctime(std::localtime(&result)) << ": Starting" << std::endl;
+	std::cout << "Starting: \t" << std::asctime(std::localtime(&result));
 
 	Graph imported;
 
 	imported.load(flsrc);
 
 	result = std::time(nullptr);
-	std::cout << std::asctime(std::localtime(&result)) << ": Loaded succesfully!" << std::endl;
+	std::cout << "Loaded: \t" << std::asctime(std::localtime(&result));
 
 	imported.cleanDuplicates();
 
-	std::cout << std::asctime(std::localtime(&result)) << ": Fixed succesfully!" << std::endl;
+	std::cout << "Fixed: \t" << std::asctime(std::localtime(&result));
 
 	imported.save(flexp);
 
 	result = std::time(nullptr);
-	std::cout << std::asctime(std::localtime(&result)) << ": Finished!" << std::endl;
+	std::cout  <<"Finished: \t" << std::asctime(std::localtime(&result));
 }
 
 int main(int argc, char** argv)
