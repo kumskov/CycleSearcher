@@ -1,15 +1,13 @@
 FLAGS=-g -std=c++11
 CXX=g++
 
-BINARIES=	test graphdump
+BINARIES=	graphdump
 
 all: $(BINARIES)
 
-test: package.o container.o parser.o graph.o test.o
-	$(CXX) $(FLAGS) package.o parser.o graph.o container.o test.o -o test
 
-graphdump: package.o container.o parser.o graph.o graphdump.o
-	$(CXX) $(FLAGS) package.o parser.o graph.o container.o graphdump.o -o graphdump
+graphdump: package.o container.o parser.o graph.o cyclesearcher.o graphdump.o
+	$(CXX) $(FLAGS) package.o parser.o graph.o container.o cyclesearcher.o graphdump.o -o graphdump
 
 package.o: package.cpp package.hpp
 	$(CXX) $(FLAGS) -c package.cpp
@@ -22,6 +20,9 @@ parser.o: parser.cpp parser.hpp
 
 graph.o: graph.cpp graph.hpp
 	$(CXX) ${FLAGS} -c graph.cpp
+
+cyclesearcher.o: cyclesearcher.cpp cyclesearcher.hpp
+	$(CXX) ${FLAGS} -c cyclesearcher.cpp
 
 test.o: test.cpp
 	$(CXX) $(FLAGS) -c test.cpp
