@@ -61,7 +61,6 @@ int Graph::findNodeRequiring(std::string pkg) const
 	return -1;
 }
 
-//TODO: Fix with exceptions or something, printing for debug right now
 void Graph::fillRequires()
 {
 	for (int i = 0; i < _ingraph.size(); ++i)
@@ -80,7 +79,18 @@ void Graph::fillRequires()
 			}
 			else
 			{
-				_ingraph[i]._requires.push_back(reqindex);
+				bool alreadyIn = false;
+				for (int k = 0; k < _ingraph[i]._requires.size(); ++k)
+				{
+					if (_ingraph[i]._requires[k] == reqindex)
+					{
+						alreadyIn = true;
+					}
+				}
+				if (!alreadyIn)
+				{
+					_ingraph[i]._requires.push_back(reqindex);
+				}
 			}
 			//sleep(1);
 		}
@@ -97,7 +107,6 @@ void Graph::fillRequires()
 	}
 }
 
-//TODO: Fix with exceptions or something, printing for debug right now
 void Graph::fillProvidesFor()
 {
 	for (int i = 0; i < _ingraph.size(); ++i)
@@ -113,7 +122,18 @@ void Graph::fillProvidesFor()
 			}
 			else
 			{
-				_ingraph[i]._providesFor.push_back(provindex);
+				bool alreadyIn = false;
+				for (int k = 0; k < _ingraph[i]._providesFor.size(); ++k)
+				{
+					if (_ingraph[i]._providesFor[k] == provindex)
+					{
+						alreadyIn = true;
+					}
+				}
+				if (!alreadyIn)
+				{
+					_ingraph[i]._providesFor.push_back(provindex);
+				}
 			}
 		}
 		//std::cout << "Prov " << i << ": done\n";
@@ -230,6 +250,7 @@ void Graph::writeNode(std::ofstream& out, const GraphNode& node) const
 	out << std::endl;
 }
 
+
 Graph::GraphNode Graph::readNode(std::ifstream& in) const
 {
 	Graph::GraphNode ret;
@@ -280,6 +301,57 @@ Graph::GraphNode Graph::readNode(std::ifstream& in) const
 	return ret;
 }
 
+void Graph::cleanDuplicates()
+{
+	for (int i = 0; i < _ingraph.size(); ++i)
+	{
+		//std::cout << i << ": ";
+		//requires
+		std::vector<int> newreqs;
+		
+		for (int j = 0; j < _ingraph[i]._requires.size(); ++j)
+		{
+			bool alreadyIn = false;
+			for (int k = 0; k < newreqs.size(); ++k)
+			{
+				if (newreqs[k] == _ingraph[i]._requires[j])
+				{
+					alreadyIn = true;
+				}
+			}
+			if (!alreadyIn)
+			{
+				newreqs.push_back(_ingraph[i]._requires[j]);
+			}
+		}
+		//std::cout << _ingraph[i]._requires.size() << ' ' << newreqs.size() << std::endl;
+		//_ingraph[i]._requires.clear();
+		_ingraph[i]._requires = newreqs;
+		//newreqs.clear();
+		
+		//provides
+		std::vector<int> newprovs;
+		for (int j = 0; j < _ingraph[i]._providesFor.size(); ++j)
+		{
+			bool alreadyIn = false;
+			for (int k = 0; k < newprovs.size(); ++k)
+			{
+				if (newprovs[k] == _ingraph[i]._providesFor[j])
+				{
+					alreadyIn = true;
+				}
+			}
+			if (!alreadyIn)
+			{
+				newprovs.push_back(_ingraph[i]._providesFor[j]);
+			}
+		}
+		_ingraph[i]._providesFor = newprovs;
+		
+	}
+}
+
+
 void Graph::save(std::string flname) const
 {
 	std::ofstream fl;
@@ -289,6 +361,7 @@ void Graph::save(std::string flname) const
 	fl << "grsize " << _ingraph.size() << std::endl;
 	for (int i = 0; i < _ingraph.size(); ++i)
 	{
+		//fl << _ingraph[i];
 		writeNode(fl, _ingraph[i]);
 		//std::cout << "Graph export: written " << i << std::endl;
 	}
@@ -316,7 +389,10 @@ void Graph::load(std::string flname)
 	fl >> nodeamount;
 	for (int i = 0; i < nodeamount; ++i)
 	{
+		//GraphNode nnode;
+		//fl >> nnode;
 		_ingraph.push_back(readNode(fl));
+		//_ingraph.push_back(nnode);
 	}
 
 	fl.close();

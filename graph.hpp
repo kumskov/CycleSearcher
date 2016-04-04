@@ -21,8 +21,14 @@ protected:
 			_pkg = src;
 			_brokenDep = false;
 		}
+		GraphNode(const GraphNode& src)
+		{
+			_pkg = src._pkg;
+			_brokenDep = src._brokenDep;
+			_requires = src._requires;
+			_providesFor = src._providesFor;
+		}
 	};
-
 
 	//Vector to store all graph links
 	std::vector<GraphNode> _ingraph;
@@ -34,7 +40,7 @@ protected:
 	int findNodeProviding(std::string) const;
 	int findNodeRequiring(std::string) const;
 
-	void debugPrintNodeVectors(int index) const;
+	//void debugPrintNodeVectors(int index) const;
 
 	void writeNode(std::ofstream&, const GraphNode&) const;
 	GraphNode readNode(std::ifstream&) const;
@@ -42,6 +48,8 @@ protected:
 public:
 	Graph();
 
+	//Optimize
+	//hash map of table (provides -> pkg)
 	void buildGraph(Container);
 
 	int getAmount() const;
@@ -51,7 +59,8 @@ public:
 
 	std::string printInfo(int index) const;
 
-	void test();
+	//Clean duplicate node links from old built graphs
+	void cleanDuplicates();
 
 	void save(std::string flname) const;
 	void load(std::string flname);
