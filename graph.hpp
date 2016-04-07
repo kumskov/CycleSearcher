@@ -8,9 +8,18 @@
 class Graph
 {
 protected:
+	bool alreadyExistsIn(std::vector<int>, int) const;
+
 	struct GraphNode
 	{
-		std::vector<int> _requires;
+		struct ReqSlot
+		{
+			std::vector<int> _possibleMatch;
+
+			ReqSlot() {};
+		};
+
+		std::vector<ReqSlot> _requires;
 		std::vector<int> _providesFor;
 		Package _pkg;
 		bool _brokenDep;
@@ -37,8 +46,8 @@ protected:
 	void fillRequires();
 
 	//For fillers
-	int findNodeProviding(std::string) const;
-	int findNodeRequiring(std::string) const;
+	std::vector<int> findNodesProviding(std::string) const;
+	std::vector<int> findNodesRequiring(std::string) const;
 
 	//void debugPrintNodeVectors(int index) const;
 

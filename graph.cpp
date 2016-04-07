@@ -31,9 +31,21 @@ void Graph::buildGraph(Container src)
 	fillProvidesFor();
 }
 
-
-int Graph::findNodeProviding(std::string pkg) const
+bool Graph::alreadyExistsIn(std::vector<int> src, int test) const
 {
+	for (int i = 0; i < src.size(); ++i)
+	{
+		if (src[i] == test)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+std::vector<int> Graph::findNodesProviding(std::string pkg) const
+{
+	std::vector<int> ret;
 	for (int i = 0; i < _ingraph.size(); ++i)
 	{
 		Package grpkg = _ingraph[i]._pkg;
@@ -41,24 +53,31 @@ int Graph::findNodeProviding(std::string pkg) const
 		if (grpkg.provides(pkg))
 		{
 			//std::cout << "GRAPH PROVIDES TRUE:" << grpkg.getDesc() << " - " << pkg << std::endl;
-			return i;
+			if (!alreadyExistsIn(ret, i))
+			{
+				ret.push_back(i);
+			}
 		}
 	}
 
-	return -1;
+	return ret;
 }
 
-int Graph::findNodeRequiring(std::string pkg) const
+std::vector<int> Graph::findNodesRequiring(std::string pkg) const
 {
+	std::vector<int> ret;
 	for (int i = 0; i < _ingraph.size(); ++i)
 	{
 		if (_ingraph[i]._pkg.requires(pkg))
 		{
-			return i;
+			if (!alreadyExistsIn(ret, i))
+			{
+				ret.push_back(i);
+			}
 		}
 	}
 
-	return -1;
+	return ret;
 }
 
 void Graph::fillRequires()
@@ -68,8 +87,8 @@ void Graph::fillRequires()
 		std::vector<std::string> reqs = _ingraph[i]._pkg.getRequires();
 		for (int j = 0; j < reqs.size(); ++j)
 		{
-			int reqindex = findNodeProviding(reqs[j]);
-			if (reqindex == -1)
+			std::vector<int> reqindex = findNodesProviding(reqs[j]);
+			if (reqindex.size() == 0)
 			{
 				_ingraph[i]._brokenDep = true;
 				//std::string exmsg = "Graph: failed to find anyone providing <" + reqs[j] + "> for <" + _ingraph[i]._pkg.getName() + ">\n";
@@ -79,18 +98,9 @@ void Graph::fillRequires()
 			}
 			else
 			{
-				bool alreadyIn = false;
-				for (int k = 0; k < _ingraph[i]._requires.size(); ++k)
-				{
-					if (_ingraph[i]._requires[k] == reqindex)
-					{
-						alreadyIn = true;
-					}
-				}
-				if (!alreadyIn)
-				{
-					_ingraph[i]._requires.push_back(reqindex);
-				}
+				GraphNode::ReqSlot rindex;
+				rindex._possibleMatch = reqindex;
+				_ingraph[i]._requires.push_back(rindex);
 			}
 			//sleep(1);
 		}
@@ -98,11 +108,11 @@ void Graph::fillRequires()
 		if (_ingraph[i]._requires.size() != _ingraph[i]._pkg.getReqAmount())
 		{
 			//throw std::runtime_error("One of the package requirements could not be resolved propely");
-			//std::cout << "Req " << i << ": something went horribly wrong" << std::endl;
+			std::cout << "Req " << i << ": something went horribly wrong" << std::endl;
 		}
 		else
 		{
-			//std::cout << "Req " << i << ": All Good!" << std::endl;
+			std::cout << "Req " << i << ": All Good!" << std::endl;
 		}
 	}
 }
@@ -114,16 +124,23 @@ void Graph::fillProvidesFor()
 		std::vector<std::string> provs = _ingraph[i]._pkg.getProvides();
 		for (int j = 0; j < provs.size(); ++j)
 		{
-			int provindex = findNodeRequiring(provs[j]);
-			if (provindex == -1)
+			std::vector<int> provindex = findNodesRequiring(provs[j]);
+			if (provindex.size() == 0)
 			{
 				//Nobody cares
 				//std::cout << "Failed to find anyone who needs: " << provs[j] << std::endl;
 			}
 			else
 			{
-				bool alreadyIn = false;
-				for (int k = 0; k < _ingraph[i]._providesFor.size(); ++k)
+				for (int k = 0; k < provindex.size(); ++k)
+				{
+					if (!alreadyExistsIn(_ingraph[i]._providesFor, provindex[k]))
+					{
+						_ingraph[i]._providesFor.push_back(provindex[k]);
+					}
+				}
+				/*
+				for (int k = 0; k < provindex.size(); ++k)
 				{
 					if (_ingraph[i]._providesFor[k] == provindex)
 					{
@@ -134,9 +151,10 @@ void Graph::fillProvidesFor()
 				{
 					_ingraph[i]._providesFor.push_back(provindex);
 				}
+				*/
 			}
 		}
-		//std::cout << "Prov " << i << ": done\n";
+		std::cout << "Prov " << i << ": done\n";
 	}
 }
 
@@ -226,12 +244,25 @@ std::string Graph::printInfo(int index) const
 	
 	ret += "REQUIRES " + std::to_string(reqsize) + " PACKAGES\n";
 	ret += "REQUIRES:\n";
+	for (int i = 0; i < tmp._pkg.getRequires().size(); ++i)
+	{
+		ret += "\t* " + tmp._pkg.getRequires()[i] + "\n";
+		ret += "\tprovided by:\n";
+		for (int j = 0; j < _ingraph[index]._requires[i]._possibleMatch.size(); ++j)
+		{
+			int pkgindex = _ingraph[index]._requires[i]._possibleMatch[j];
+			ret += "\t\t" + _ingraph[pkgindex]._pkg.getName() + '\n';
+			ret += "\t\t- " + _ingraph[pkgindex]._pkg.getDesc() + '\n';
+		}
+	}
+	/*
 	for (int i = 0; i < reqsize; ++i)
 	{
 		int pkgindex = _ingraph[index]._requires[i];
 		ret += "\t* " + _ingraph[pkgindex]._pkg.getName() + '\n';
 		ret += "\t-> " + _ingraph[pkgindex]._pkg.getDesc() + '\n';
 	}
+	*/
 
 	ret += "PROVIDES FOR " + std::to_string(provsize) + " PACKAGES\n";	
 	for (int i = 0; i < provsize; ++i)
@@ -253,9 +284,14 @@ void Graph::writeNode(std::ofstream& out, const GraphNode& node) const
 	out << "reqindex " << node._requires.size() << std::endl;
 	for (int i = 0; i < node._requires.size(); ++i)
 	{
-		out << node._requires[i] << ' ';
+		out << "reqslotindex " << node._requires[i]._possibleMatch.size() << std::endl;
+		for (int j = 0; j < node._requires[i]._possibleMatch.size(); ++j)
+		{
+			out << node._requires[i]._possibleMatch[j] << ' ';
+		}
+		out << std::endl;
 	}
-	out << std::endl;
+	
 	out << "provindex " << node._providesFor.size() << std::endl;
 	for (int i = 0; i < node._providesFor.size(); ++i)
 	{
@@ -292,9 +328,23 @@ Graph::GraphNode Graph::readNode(std::ifstream& in) const
 	in >> reqamount;
 	for (int i = 0; i < reqamount; ++i)
 	{
-		int val = 0;
-		in >> val;
-		ret._requires.push_back(val);
+		ret._requires.push_back(GraphNode::ReqSlot());
+	}
+	for (int i = 0; i < reqamount; ++i)
+	{
+		in >> checker;
+		if (checker != "reqslotindex")
+		{
+			throw std::runtime_error("Graph input: Failed to read require slot index header");
+		}
+		int reqslotamount = 0;
+		in >> reqslotamount;
+		for (int j = 0; j < reqslotamount; ++j)
+		{
+			int val = 0;
+			in >> val;
+			ret._requires[i]._possibleMatch.push_back(val);
+		}
 	}
 
 	in >> checker;
@@ -319,6 +369,7 @@ void Graph::cleanDuplicates()
 {
 	for (int i = 0; i < _ingraph.size(); ++i)
 	{
+		/*
 		//std::cout << i << ": ";
 		//requires
 		std::vector<int> newreqs;
@@ -342,7 +393,7 @@ void Graph::cleanDuplicates()
 		//_ingraph[i]._requires.clear();
 		_ingraph[i]._requires = newreqs;
 		//newreqs.clear();
-		
+		*/
 		//provides
 		std::vector<int> newprovs;
 		for (int j = 0; j < _ingraph[i]._providesFor.size(); ++j)
