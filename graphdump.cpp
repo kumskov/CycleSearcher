@@ -12,6 +12,7 @@ void usageHelp()
 	std::cout << "Usage:\t./graphdump import <export file>" << std::endl;
 	std::cout << "\t./graphdump export <source file> <export file>" << std::endl;
 	std::cout << "\t./graphdump fix <source file> <export file>" << std::endl;
+	std::cout << "\t./graphdump cycle <source file>" << std::endl;
 }
 
 void exporter(std::string flsrc, std::string flexp)
@@ -157,14 +158,17 @@ void cycler(std::string flname)
 	std::cout << "Total amount of packages: " << size << std::endl;
 
 	worker.findCycles();
+	CycleContainer data = worker.getCycles();
 
-	std::cout << worker.cycleAmount() << " cycles total" << std::endl;
+	std::cout << data.getCycleAmount() << " cycles total" << std::endl;
+	std::cout << data.getSelfCycleAmount() << " cycles total" << std::endl;
 	while(1)
 	{
 		std::cout << "Input what cycle to print: ";
 		int index;
 		std::cin >> index;
-		std::cout << worker.cycleToString(index) << std::endl;
+		std::cout << data.cycleToString(index) << std::endl;
+		//std::cout << worker.cycleToString(index) << std::endl;
 	}
 }
 
