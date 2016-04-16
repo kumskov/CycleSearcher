@@ -15,7 +15,7 @@ protected:
 	std::vector<Cycle> _cycles;
 	std::vector<int> _selfcycles;
 
-	bool alreadyAdded(std::vector<int>) const;
+	bool alreadyInCycles(std::vector<int>) const;
 	bool alreadyInSelfCycles(int) const;
 
 public:
@@ -44,16 +44,17 @@ protected:
 	struct FireHistory
 	{
 		int _mark;
-		std::vector<int> _path;
-		int _loopIndex;
+		//std::vector<int> _path;
+		//int _loopIndex;
 	};
+	
 
 	std::vector<FireHistory> _visited;
 	//Every time a node "ends" a cycle, i.e. links to a node
 	//that is already visited, it's added here in order to be able to
 	//reconstruct the cycle
 	std::vector<int> _selfcycle;
-	std::vector<int> _endcycle;
+	//std::vector<int> _endcycle;
 	//std::vector< std::vector<int> > _cycles;
 
 
@@ -61,7 +62,6 @@ protected:
 
 	bool allVisited() const;
 
-	//"Fire in the praire" algorithm
 	//Basicly the same as dijkstra but insted of marking nodes
 	//as "visited/not visited" we place length of recurse
 	//Resursive, starts with 0
@@ -69,15 +69,18 @@ protected:
 
 	int findFirstUnvisited() const;
 
+	//Finds all selfcycling nodes
 	void checkSelfLinks();
 	//void countSlots() const;
 
 	//return true if added
 	bool addSelfCyclingNode(int);
 
-	std::vector<int> rebuildCycle(int) const;
+	//std::vector<int> rebuildCycle(int) const;
 
-	void addEndCycle(int);
+	std::vector<int> extractCycle(std::vector<int>) const;
+
+	//void addEndCycle(int);
 	void addEndCycle(std::vector<int>);
 
 	bool isCycle(std::vector<int>) const;
@@ -85,8 +88,8 @@ protected:
 public:
 	CycleSearcher();
 	//Build a cycle from "ending" nodes
-	CycleContainer getCycles() const;
-	std::string cycleToString(int) const;
+	CycleContainer getCycleContainer() const;
+	//std::string cycleToString(int) const;
 
 	//int cycleAmount() const;
 	//int selfCycleAmount() const;
