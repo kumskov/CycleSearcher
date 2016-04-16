@@ -154,14 +154,18 @@ void cycler(std::string flname)
 	result = std::time(nullptr);
 	std::cout << "Loaded: \t" << std::asctime(std::localtime(&result));
 
-	int size = worker.getAmount();
-	std::cout << "Total amount of packages: " << size << std::endl;
+	//int size = worker.getAmount();
+	//std::cout << "Total amount of packages: " << size << std::endl;
 
 	worker.findCycles();
-	CycleContainer data = worker.getCycles();
+	CycleContainer data = worker.getCycleContainer();
+
+	result = std::time(nullptr);
+	std::cout << "Got cycles: \t" << std::asctime(std::localtime(&result));
+
 
 	std::cout << data.getCycleAmount() << " cycles total" << std::endl;
-	std::cout << data.getSelfCycleAmount() << " cycles total" << std::endl;
+	std::cout << data.getSelfCycleAmount() << " selfcycles total" << std::endl;
 	while(1)
 	{
 		std::cout << "Input what cycle to print: ";
