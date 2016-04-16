@@ -10,10 +10,22 @@ protected:
 	struct Cycle
 	{
 		std::vector<int> _path;
+
+		Cycle(std::vector<int> src)
+		{
+			_path = src;
+		}
+
+		Cycle() {}
 	};
 
 	std::vector<Cycle> _cycles;
 	std::vector<int> _selfcycles;
+
+	std::vector< std::vector<Cycle> > _filtered;
+	std::vector< std::string> _filterparams;
+
+	Graph _source;
 
 	bool alreadyInCycles(std::vector<int>) const;
 	bool alreadyInSelfCycles(int) const;
@@ -23,13 +35,26 @@ public:
 
 	int getCycleAmount() const;
 	int getSelfCycleAmount() const;
+	int getFilteredCycleAmount() const;
+	int getFilteredCycleAmountAt(int) const;
+	std::string getFilterName(int) const;
+
 	void addCycle(std::vector<int>);
 	void addSelfCycle(int);
+	void addFilteredCycle(int, std::vector<int>);
+	void addFilter(std::string);
+
+	int findFilter(std::string) const;
+
+	void setGraph(Graph);
+	Graph getGraph() const;
 
 	std::string getInfo() const;
 
 	//std::string cycleToString(std::vector<int>) const;
 	std::string cycleToString(int) const;
+
+	void applyFilter();
 };
 
 
