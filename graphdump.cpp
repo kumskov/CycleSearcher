@@ -3,6 +3,7 @@
 #include "container.hpp"
 #include "graph.hpp"
 #include "cyclesearcher.hpp"
+#include "cyclecontainer.hpp"
 #include <iostream>
 #include <ctime>
 
@@ -158,14 +159,23 @@ void cycler(std::string flname)
 	//std::cout << "Total amount of packages: " << size << std::endl;
 
 	worker.findCycles();
-	CycleContainer data = worker.getCycleContainer();
-
 	result = std::time(nullptr);
 	std::cout << "Got cycles: \t" << std::asctime(std::localtime(&result));
 
+	CycleContainer data;
+	data.loadData(worker);
+	data.addFilter("lang");
+	data.addFilter("data");
+	//data.applyFilter(worker);
 
-	std::cout << data.getCycleAmount() << " cycles total" << std::endl;
-	std::cout << data.getSelfCycleAmount() << " selfcycles total" << std::endl;
+	result = std::time(nullptr);
+	std::cout << "Filtered: \t" << std::asctime(std::localtime(&result));
+	
+
+	std::cout << data.getInfo() << std::endl;
+
+	//std::cout << data.getCycleAmount() << " cycles total" << std::endl;
+	//std::cout << data.getSelfCycleAmount() << " selfcycles total" << std::endl;
 	while(1)
 	{
 		std::cout << "Input what cycle to print: ";
