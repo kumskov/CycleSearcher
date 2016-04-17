@@ -1,207 +1,5 @@
 #include "cyclesearcher.hpp"
 
-//##################################################//
-//													//
-//					CycleContainer					//
-//													//
-//##################################################//
-
-bool CycleContainer::alreadyInCycles(std::vector<int> cmp) const
-{
-	for(int i = 0; i < _cycles.size(); ++i)
-	{
-		if (_cycles[i]._path == cmp)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-bool CycleContainer::alreadyInSelfCycles(int cmp) const
-{
-	for (int i = 0; i < _selfcycles.size(); ++i)
-	{
-		if (_selfcycles[i] == cmp)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-int CycleContainer::getCycleAmount() const
-{
-	return _cycles.size();
-}
-
-int CycleContainer::getSelfCycleAmount() const
-{
-	return _selfcycles.size();
-}
-
-void CycleContainer::addCycle(std::vector<int> ncycle)
-{
-	if (ncycle.size() == 0)
-	{
-		return;
-	}
-	if (!alreadyInCycles(ncycle))
-	{
-		Cycle toadd;
-		toadd._path = ncycle;
-		_cycles.push_back(toadd);
-	}
-}
-
-void CycleContainer::addSelfCycle(int nselfcycle)
-{
-	if (!alreadyInSelfCycles(nselfcycle))
-	{
-		_selfcycles.push_back(nselfcycle);
-	}
-}
-
-/*
-std::string CycleContainer::cycleToString(std::vector<int> vec) const
-{
-	std::string ret;
-	//std::vector<int> c = rebuildCycle(_endcycle[index]);
-	for (int i = 0; i < vec.size(); ++i)
-	{
-		ret += std::to_string(vec[i]) + (i != (vec.size()-1) ? " -> " : "\n");
-	}
-
-	return ret;
-}
-*/
-
-std::string CycleContainer::cycleToString(int index) const
-{
-	std::string ret;
-	if (index >= _cycles.size())
-	{
-		throw std::logic_error("CycleContainer: requested index higher than exists");
-	}
-
-	std::vector<int> c = _cycles[index]._path;
-	for (int i = 0; i < c.size(); ++i)
-	{
-		ret += std::to_string(c[i]) + (i != (c.size()-1) ? " -> " : "\n");
-	}
-
-	return ret;
-}
-
-
-std::string CycleContainer::getInfo() const
-{
-	if (_filterparams.size() != _filtered.size())
-	{
-		throw std::logic_error("CycleContainer: There was a problem with filters");
-	}
-
-	std::string ret = "";
-
-	ret += "### CYCLE CONTAINER INFO ###\n\n";
-	int totalsize = _cycles.size() + _selfcycles.size();
-	int nofiltersize = totalsize;
-
-	for (int i = 0; i < _filtered.size(); ++i)
-	{
-		totalsize += _filtered[i].size();
-	}
-
-	ret += "Filters amount: " + std::to_string(_filterparams.size()) + "\n";
-	ret += "Total cycles amount: " + std::to_string(totalsize) + "\n";
-	ret += "From those " + std::to_string(totalsize) + " cycles:\n";
-	ret += "\t " + std::to_string(_selfcycles.size()) + " loop into themselves\n";
-	ret += "\t " + std::to_string(_cycles.size()) + " are normal cycles\n";
-
-	if (_filterparams.size() != 0)
-	{
-		ret += "\t " + std::to_string(totalsize - nofiltersize) + " are filtered\n\n";
-		ret += "Filter parameters are:\n";
-
-		for (int i = 0; i < _filterparams.size(); ++i)
-		{
-			ret += "\t \'" + _filterparams[i] + "\': " + std::to_string(_filtered[i].size()) + " cycles\n";
-		}
-	}
-
-	return ret;
-}
-
-void CycleContainer::setGraph(Graph ref)
-{
-	_source = ref;
-}
-
-Graph CycleContainer::getGraph() const
-{
-	return _source;
-}
-
-void CycleContainer::addFilteredCycle(int index, std::vector<int> toAdd)
-{
-	if (_filtered.size() <= index)
-	{
-		throw std::logic_error("CycleContainer: Tried to add to non-existant filter index");
-	}
-
-	_filtered[index].push_back(Cycle(toAdd));
-}
-
-void CycleContainer::addFilter(std::string nfilter)
-{
-	_filterparams.push_back(nfilter);
-	_filtered.push_back(std::vector<Cycle>());
-}
-
-int CycleContainer::getFilteredCycleAmount() const
-{
-	return _filtered.size();
-}
-
-int CycleContainer::getFilteredCycleAmountAt(int index) const
-{
-	if (_filtered.size() <= index)
-	{
-		throw std::logic_error("CycleContainer: Tried to get non-existant filter index");
-	}
-
-	return _filtered[index].size();
-}
-
-std::string CycleContainer::getFilterName(int index) const
-{
-	if (_filterparams.size() <= index)
-	{
-		throw std::logic_error("CycleContainer: Tried to get non-existant filter index");
-	}
-
-	return _filterparams[index];
-}
-
-int CycleContainer::findFilter(std::string cmp) const
-{
-	int ret = -1;
-	for (int i = 0; i < _filterparams.size(); ++i)
-	{
-		if (cmp == _filterparams[i])
-		{
-			ret = i;
-			break;
-		}
-	}
-	return ret;
-}
-
-void CycleContainer::applyFilter()
-{
-	std::cout << "FINISH ME" << std::endl;
-}
-
 
 //##################################################//
 //													//
@@ -678,6 +476,7 @@ std::vector<int> CycleSearcher::rebuildCycle(int index) const
 	return ret;
 }
 */
+
 std::vector<int> CycleSearcher::extractCycle(std::vector<int> toExtract) const
 {
 	if (!isCycle(toExtract))
@@ -705,6 +504,7 @@ std::vector<int> CycleSearcher::extractCycle(std::vector<int> toExtract) const
 	return ret;
 }
 
+/*
 CycleContainer CycleSearcher::getCycleContainer() const
 {
 	CycleContainer ret;
@@ -724,6 +524,28 @@ CycleContainer CycleSearcher::getCycleContainer() const
 	}
 
 	return ret;
+}
+*/
+
+std::vector< std::vector<int> > CycleSearcher::getCycles() const
+{
+	std::vector< std::vector<int> > ret;
+
+	for (int i = 0; i < _cyclepath.size(); ++i)
+	{
+		//std::vector<int> toadd = rebuildCycle(_endcycle[i]);
+		std::vector<int> toadd = extractCycle(_cyclepath[i]);
+		//ret.addCycle(toadd);
+		ret.push_back(toadd);
+		//std::cout << i << " out of " << _endcycle.size() << std::endl;
+	}
+
+	return ret;
+}
+
+std::vector<int> CycleSearcher::getSelfCycles() const
+{
+	return _selfcycle;
 }
 
 /*
