@@ -193,6 +193,7 @@ std::ofstream &operator << (std::ofstream& in, const Package& pkg)
 	{
 		in << pkg._provides[i] << ' ';
 	}
+	in << std::endl;
 	in << "requires" << ' ' << pkg._requires.size() << std::endl;
 	for (int i = 0; i < pkg._requires.size(); ++i)
 	{
@@ -213,7 +214,9 @@ std::ifstream &operator >> (std::ifstream& out, Package& pkg)
 
 	out >> checker;
 	pkg._name = checker;
+	//Get to the end of the line and step to the next
 	std::getline(out, checker);
+	//Actually get the description
 	std::getline(out, checker);
 	pkg._desc = checker;
 
