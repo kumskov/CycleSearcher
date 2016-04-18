@@ -1,5 +1,18 @@
 #include "dotexport.hpp"
 
+DotExporter::DotExporter() {}
+
+DotExporter::DotExporter(std::string name)
+{
+	_graphname = name;
+}
+
+DotExporter::DotExporter(std::string name, std::string flname)
+{
+	_fl = flname;
+	_graphname = name;
+}
+
 void DotExporter::addPackage(Package pkg)
 {
 	_names.push_back(pkg.getName());
@@ -61,6 +74,16 @@ bool DotExporter::getMarkBroken() const
 	return _markBroken;
 }
 
+void DotExporter::setName(std::string name)
+{
+	_graphname = name;
+}
+
+std::string DotExporter::getName() const
+{
+	return _graphname;
+}
+
 bool DotExporter::checkSingleSlot(std::vector< std::vector<int> > reqs) const
 {
 	for (int i = 0; i < reqs.size(); ++i)
@@ -108,6 +131,7 @@ void DotExporter::generateLinks(int index, std::vector<int> reqs, Graph src)
 		simplelink._from = index;
 		simplelink._to = toindex;
 		simplelink._dep = src[reqs[i]].getRequires()[i];
+		simplelink._loop = false;
 
 		_paths.push_back(simplelink);
 	}
@@ -119,6 +143,8 @@ void DotExporter::generateSlotLinks(int index, std::vector< std::vector<int> > r
 	{
 		throw std::logic_error("DotExporter: Invalid index (not found previously)");
 	}
+
+	throw std::logic_error("FIX IT");
 
 	std::string start = _encodednames[index];
 
@@ -135,9 +161,10 @@ void DotExporter::generateSlotLinks(int index, std::vector< std::vector<int> > r
 			std::string end = _encodednames[toindex];
 
 			std::string newpath;
-			newpath = start + " -> " + end;
+			newpath = newslot._slotname + " -> " + end;
 
 			newslot._paths.push_back(newpath);
+			newslot._loop.push_back(false);
 		}
 
 		_slotpaths.push_back(newslot);
@@ -153,6 +180,79 @@ void DotExporter::generateFromGraph(Graph src)
 
 	for (int i = 0; i < src.getAmount(); ++i)
 	{
+		std::vector< std::vector<int> > reqs = src.getRequires(i);
 
+		if (checkSingleSlot(reqs))
+		{
+			generateLinks(i, transformSingleSlot(reqs), src);
+		}
+		else
+		{
+			generateSlotLinks(i, reqs, src);
+		}
 	}
+}
+
+void DotExporter::markCycles(CycleContainer src)
+{
+	throw std::logic_error("DotExporter: markCycles unfinshed");
+}
+
+void DotExporter::save()
+{
+	std::ofstream dotfile;
+	dotfile.open(_fl.c_str(), std::ofstream::out);
+
+	dotfile << "digraph " << _graphname << " {" << std::endl;
+
+	dotfile << std::endl << "// Graph node names" << std::endl;
+	for (int i = 0; i < _names.size(); ++i)
+	{
+		dotfile << "\t";
+		dotfile << _encodednames[i] << " ";
+		dotfile << "[label=\"" << _names[i] << "\" shape=box]" << std::endl; 
+	}
+
+	if (!_slotIgnore)
+	{
+		dotfile << std::endl << "// Slot nodes" << std::endl;
+
+		for (int i = 0; i < _slotpaths.size(); ++i)
+		{
+			dotfile << "\t";
+			dotfile << "slot_" + generateName(_slotpaths[i]._slotname) + " ";
+			dotfile << "[label=\"" << _slotpaths[i]._slotname << "\" shape=circle]" << std::endl; 
+		}
+	}
+
+	dotfile << std::endl << "// Graph links" << std::endl;
+
+	for (int i = 0; i < _paths.size(); ++i)
+	{
+		dotfile << "\t";
+		dotfile << _paths[i]._path;
+		dotfile << " [";
+		if (_paths[i]._loop)
+		{
+			dotfile << "color=red ";
+		}
+		dotfile << "label=\"" << _paths[i]._dep << "\"]";
+		dotfile << std::endl;
+	}
+
+	if (!_slotIgnore)
+	{
+		dotfile << std::endl << "// Graph slot links" << std::endl;
+
+		for (int i = 0; i < _slotpaths.size(); ++i)
+		{
+			//dotfile << "\t";
+			throw std::logic_error("DotExporter: save is unfinished, slot links");
+		}
+	}
+
+	dotfile << "}" << std::endl;
+
+	dotfile.close();
+
 }

@@ -1,8 +1,10 @@
 #ifndef __DOTEXPORT_HPP__
 #define __DOTEXPORT_HPP__
+
 #include "package.hpp"
 #include "graph.hpp"
 #include "cyclecontainer.hpp"
+#include <fstream>
 
 
 class DotExporter
@@ -14,6 +16,7 @@ protected:
 		int _from;
 		int _to;
 		std::string _dep;
+		bool _loop;
 	};
 
 	struct SlotLink
@@ -22,6 +25,7 @@ protected:
 		std::string _slotname;
 		int _from;
 		std::vector<int> _to;
+		std::vector<bool> _loop;
 	};
 
 	std::vector<std::string> _names;
@@ -37,6 +41,8 @@ protected:
 
 	std::string _fl;
 
+	std::string _graphname;
+
 	int findName(std::string) const;
 	std::string generateName(std::string);
 
@@ -49,6 +55,8 @@ protected:
 
 public:
 	DotExporter();
+	DotExporter(std::string);
+	DotExporter(std::string, std::string);
 
 	void setFile(std::string);
 
@@ -57,6 +65,9 @@ public:
 
 	void setMarkBroken(bool);
 	bool getMarkBroken() const;
+
+	void setName(std::string);
+	std::string getName() const;
 
 	void generateFromGraph(Graph);
 	void markCycles(CycleContainer);
