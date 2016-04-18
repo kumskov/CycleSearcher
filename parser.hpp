@@ -44,6 +44,7 @@ class Parser
 {
 protected:
 	InFile _repo;
+	//Isn't needed since packages are kept in the container
 	//std::vector<Package> _pkgs;
 	Container _pkgs;
 	bool _parsed;
