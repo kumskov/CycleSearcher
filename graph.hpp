@@ -76,6 +76,8 @@ public:
 	void save(std::string flname) const;
 	void load(std::string flname);
 
+	std::vector<int> getProvides(int) const;
+	std::vector< std::vector<int> > getRequires(int) const;
 };
 
 

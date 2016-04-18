@@ -108,11 +108,11 @@ void Graph::fillRequires()
 		if (_ingraph[i]._requires.size() != _ingraph[i]._pkg.getReqAmount())
 		{
 			//throw std::runtime_error("One of the package requirements could not be resolved propely");
-			std::cout << "Req " << i << ": something went horribly wrong" << std::endl;
+			//std::cout << "Req " << i << ": something went horribly wrong" << std::endl;
 		}
 		else
 		{
-			std::cout << "Req " << i << ": All Good!" << std::endl;
+			//std::cout << "Req " << i << ": All Good!" << std::endl;
 		}
 	}
 }
@@ -154,7 +154,7 @@ void Graph::fillProvidesFor()
 				*/
 			}
 		}
-		std::cout << "Prov " << i << ": done\n";
+		//std::cout << "Prov " << i << ": done\n";
 	}
 }
 
@@ -461,4 +461,32 @@ void Graph::load(std::string flname)
 	}
 
 	fl.close();
+}
+
+std::vector<int> getProvides(int index) const
+{
+	if ((index >= _ingraph.size()) ||
+		(index < 0))
+	{
+		throw std::logic_error("Graph: Tried to get invalit index");
+	}
+
+	return _ingraph[index]._providesFor;
+}
+
+std::vector< std::vector<int> > getRequires(int index) const
+{
+	if ((index >= _ingraph.size()) ||
+		(index < 0))
+	{
+		throw std::logic_error("Graph: Tried to get invalit index");
+	}
+
+	std::vector< std::vector<int> > ret;
+	for (int i = 0; i < _ingraph[index]._requires.size())
+	{
+		ret.push_back(_ingraph[index]._requires[i]._possibleMatch);
+	}
+
+	return ret;
 }
