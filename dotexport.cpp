@@ -5,6 +5,8 @@ DotExporter::DotExporter() {}
 DotExporter::DotExporter(std::string name)
 {
 	_graphname = name;
+	_slotIgnore = false;
+	_markBroken = true;
 }
 
 DotExporter::DotExporter(std::string name, std::string flname)
@@ -124,6 +126,10 @@ void DotExporter::generateLinks(int index, std::vector<int> reqs, Graph src)
 	for (int i = 0; i < reqs.size(); ++i)
 	{
 		int toindex = reqs[i];
+		if (reqs[i] == -1)
+		{
+			continue;
+		}
 		std::string end = _encodednames[toindex];
 
 		Link simplelink;

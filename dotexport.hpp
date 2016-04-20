@@ -17,6 +17,7 @@ protected:
 		int _to;
 		std::string _dep;
 		bool _loop;
+		bool _broken;
 	};
 
 	struct SlotLink
@@ -28,6 +29,7 @@ protected:
 		int _from;
 		std::vector<int> _to;
 		std::vector<bool> _loop;
+		bool _broken;
 	};
 
 	std::vector<std::string> _names;
@@ -57,8 +59,8 @@ protected:
 
 public:
 	DotExporter();
-	DotExporter(std::string);
-	DotExporter(std::string, std::string);
+	DotExporter(std::string name);
+	DotExporter(std::string name, std::string flname);
 
 	void setFile(std::string);
 
