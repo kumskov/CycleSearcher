@@ -4,16 +4,18 @@
 #include "graph.hpp"
 #include "cyclesearcher.hpp"
 #include "cyclecontainer.hpp"
+#include "dotexport.hpp"
 #include <iostream>
 #include <ctime>
 
 
 void usageHelp()
 {
-	std::cout << "Usage:\t./graphdump import <export file>" << std::endl;
-	std::cout << "\t./graphdump export <source file> <export file>" << std::endl;
-	std::cout << "\t./graphdump fix <source file> <export file>" << std::endl;
+	std::cout << "Usage:\t./graphdump import <target file>" << std::endl;
+	std::cout << "\t./graphdump export <source file> <target file>" << std::endl;
+	std::cout << "\t./graphdump fix <source file> <target file>" << std::endl;
 	std::cout << "\t./graphdump cycle <source file>" << std::endl;
+	std::cout << "\t./graphdump dotexport <source file> <target file>" << std::endl;
 }
 
 void exporter(std::string flsrc, std::string flexp)
@@ -186,6 +188,47 @@ void cycler(std::string flname)
 	}
 }
 
+void dotexporter(std::string flsrc, std::string flexp)
+{
+	std::time_t result = std::time(nullptr);
+	std::cout << "Starting: \t" << std::asctime(std::localtime(&result));
+
+	CycleSearcher worker;
+
+	worker.load(flsrc);
+
+	result = std::time(nullptr);
+	std::cout << "Loaded: \t" << std::asctime(std::localtime(&result));
+
+	//int size = worker.getAmount();
+	//std::cout << "Total amount of packages: " << size << std::endl;
+
+	worker.findCycles();
+	result = std::time(nullptr);
+	std::cout << "Got cycles: \t" << std::asctime(std::localtime(&result));
+
+	CycleContainer data;
+	data.loadData(worker);
+	data.addFilter("lang");
+	data.addFilter("data");
+	//data.applyFilter(worker);
+
+	result = std::time(nullptr);
+	std::cout << "Filtered: \t" << std::asctime(std::localtime(&result));
+	
+	DotExporter testexport("Fedora repo", flexp);
+
+	testexport.generateFromGraph(worker);
+
+	result = std::time(nullptr);
+	std::cout << "Generated export: \t" << std::asctime(std::localtime(&result));
+
+	testexport.save();
+
+	result = std::time(nullptr);
+	std::cout << "Finished: \t" << std::asctime(std::localtime(&result));
+}
+
 int main(int argc, char** argv)
 {
 	if (argc < 3)
@@ -208,6 +251,19 @@ int main(int argc, char** argv)
 
 		std::string flexp = argv[3];
 		exporter(fl, flexp);
+		return 0;
+	}
+	if (option == "dotexport")
+	{
+		if (argc != 4)
+		{
+			std::cout << "Not enough parameters!" << std::endl;
+			usageHelp();
+			return -1;
+		}
+
+		std::string flexp = argv[3];
+		dotexporter(fl, flexp);
 		return 0;
 	}
 	if (option == "import")
