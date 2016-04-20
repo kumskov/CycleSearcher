@@ -60,6 +60,12 @@ public:
 	std::string cycleToString(int) const;
 
 	void applyFilter(Graph);
+
+	std::vector<int> getSelfCycles() const;
+	std::vector< std::vector<int> > getCycles() const;
+
+	std::vector< std::vector<int> > getFilteredCycle(int) const;
+	std::string getFilterParameter() const;
 };
 
 

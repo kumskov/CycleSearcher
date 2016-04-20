@@ -299,3 +299,49 @@ void CycleContainer::loadData(CycleSearcher resourse)
 		//std::cout << i << " out of " << _endcycle.size() << std::endl;
 	}
 }
+
+std::vector<int> CycleContainer::getSelfCycle() const
+{
+	return _selfcycles;
+}
+
+std::vector< std::vector<int> > CycleContainer::getCycles() const
+{
+	std::vector< std::vector<int> > ret;
+
+	for (int i = 0; i < _cycles.size(); ++i)
+	{
+		ret.push_back(_cycles[i]._path);
+	}
+
+	return ret;
+}
+
+std::vector< std::vector<int> > CycleContainer::getFilteredCycle(int index) const
+{
+	if ((index < 0) ||
+		(index > _filtered.size())
+	{
+		throw std::logic_error("CycleContainer: Requested invalid filter index");
+	}
+
+	std::vector< std::vector<int> > ret;
+
+	for (int i = 0; i < _filtered[index].size(); ++i)
+	{
+		ret.push_back(_filtered[index][i]._path);
+	}
+
+	return ret;
+}
+
+std::string CycleContainer::getFilterParameter(int index) const
+{
+	if ((index < 0) ||
+		(index > _filterparams.size())
+	{
+		throw std::logic_error("CycleContainer: Requested invalid filter index");
+	}
+
+	return _filterparams[index];
+}
