@@ -91,6 +91,10 @@ void Graph::fillRequires()
 			if (reqindex.size() == 0)
 			{
 				_ingraph[i]._brokenDep = true;
+				//-1 for non-existant deps
+				GraphNode::ReqSlot rindex;
+				rindex._possibleMatch.push_back(-1);
+				_ingraph[i]._requires.push_back(rindex);
 				//std::string exmsg = "Graph: failed to find anyone providing <" + reqs[j] + "> for <" + _ingraph[i]._pkg.getName() + ">\n";
 				//throw std::runtime_error(exmsg);
 				
