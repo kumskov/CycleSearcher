@@ -1,39 +1,23 @@
 FLAGS=-g -std=c++11
 CXX=g++
+LDFLAGS=
+SOURCES=package.cpp \
+		container.cpp \
+		parser.cpp \
+		graph.cpp \
+		cyclesearcher.cpp \
+		cyclecontainer.cpp \
+		dotexport.cpp \
+		graphdump.cpp
 
-BINARIES=	graphdump
+OBJECTS=$(SOURCES:.cpp=.o)
+BINARIES=graphdump
 
-all: $(BINARIES)
+all: $(OBJECTS)
+	$(CXX) $(LDFLAGS) $(OBJECTS) -o $(BINARIES)
 
-graphdump: package.o container.o parser.o graph.o cyclesearcher.o cyclecontainer.o graphdump.o
-	$(CXX) $(FLAGS) package.o parser.o graph.o container.o cyclesearcher.o cyclecontainer.o graphdump.o -o graphdump
-
-#graphdump: package.o container.o parser.o graph.o graphdump.o
-#	$(CXX) $(FLAGS) package.o parser.o graph.o container.o graphdump.o -o graphdump
-
-package.o: package.cpp package.hpp
-	$(CXX) $(FLAGS) -c package.cpp
-
-container.o: parser.cpp parser.hpp
-	$(CXX) $(FLAGS) -c container.cpp
-
-parser.o: parser.cpp parser.hpp
-	$(CXX) $(FLAGS) -c parser.cpp
-
-graph.o: graph.cpp graph.hpp
-	$(CXX) ${FLAGS} -c graph.cpp
-
-cyclesearcher.o: cyclesearcher.cpp cyclesearcher.hpp
-	$(CXX) ${FLAGS} -c cyclesearcher.cpp
-
-cyclecontainer.o: cyclecontainer.cpp cyclecontainer.hpp
-	$(CXX) ${FLAGS} -c cyclecontainer.cpp
-
-test.o: test.cpp
-	$(CXX) $(FLAGS) -c test.cpp
-
-graphdump.o: graphdump.cpp
-	$(CXX) $(FLAGS) -c graphdump.cpp
+.cpp.o:
+	$(CXX) $(FLAGS) -c $<
 
 clean:
 	rm -f $(BINARIES)
