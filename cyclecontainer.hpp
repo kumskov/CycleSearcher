@@ -65,7 +65,7 @@ public:
 	std::vector< std::vector<int> > getCycles() const;
 
 	std::vector< std::vector<int> > getFilteredCycle(int) const;
-	std::string getFilterParameter() const;
+	std::string getFilterParameter(int) const;
 };
 
 
