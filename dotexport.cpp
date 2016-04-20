@@ -88,13 +88,21 @@ std::string DotExporter::getName() const
 
 bool DotExporter::checkSingleSlot(std::vector< std::vector<int> > reqs) const
 {
+	//for (int i = 0; i < reqs.size(); ++i)
+	//{
+	//	std::cout << reqs[i].size() << ':' << reqs[i][0] << ' ';
+	//}
+	//std::cout << std::endl;
+
 	for (int i = 0; i < reqs.size(); ++i)
 	{
-		if ((reqs.size() > 1))
+		if ((reqs[i].size() > 1))
 		{
+			//std::cout << "Not single" << std::endl;
 			return false;
 		}
 	}
+	//std::cout << "Single" << std::endl;
 	return true;
 }
 
@@ -121,8 +129,10 @@ void DotExporter::generateLinks(int index, std::vector<int> reqs, Graph src)
 		throw std::logic_error("DotExporter: Invalid index (not found previously)");
 	}
 
-	std::string start = _encodednames[index];
+	//std::cout << src[index].getRequires().size() << " " << reqs.size() << std::endl;
 
+	std::string start = _encodednames[index];
+	//std::cout << "Single: got encoded" << std::endl;
 	for (int i = 0; i < reqs.size(); ++i)
 	{
 		int toindex = reqs[i];
@@ -132,11 +142,16 @@ void DotExporter::generateLinks(int index, std::vector<int> reqs, Graph src)
 		}
 		std::string end = _encodednames[toindex];
 
+		//std::cout << src[reqs[i]].getName() << " " << _names[reqs[i]] << std::endl;
+		//std::cout << src[reqs[i]].getRequires().size() << " " << reqs.size() << std::endl;
+
 		Link simplelink;
 		simplelink._path = start + " -> " + end;
 		simplelink._from = index;
 		simplelink._to = toindex;
-		simplelink._dep = src[reqs[i]].getRequires()[i];
+		//std::cout << src[reqs[i]].getRequires().size() << ":" << i << std::endl;
+		simplelink._dep = src[index].getRequires()[i];
+		//std::cout << i << ":" << reqs.size() << "Got req dep" << std::endl;
 		simplelink._loop = false;
 
 		_paths.push_back(simplelink);
@@ -157,6 +172,7 @@ void DotExporter::generateSlotLinks(int index, std::vector< std::vector<int> > r
 
 	for (int i = 0; i < reqs.size(); ++i)
 	{
+		//std::cout << "Slot size: " << reqs[i].size() << std::endl;
 		if (reqs[i].size() == 0)
 		{
 			//Mark broken here
@@ -164,6 +180,7 @@ void DotExporter::generateSlotLinks(int index, std::vector< std::vector<int> > r
 		}
 		if (reqs[i].size() == 1)
 		{
+			//std::cout << "Working at simple" << std::endl;
 			int toindex = reqs[i][0];
 			std::string end = _encodednames[toindex];
 
@@ -171,13 +188,14 @@ void DotExporter::generateSlotLinks(int index, std::vector< std::vector<int> > r
 			simplelink._path = start + " -> " + end;
 			simplelink._from = index;
 			simplelink._to = toindex;
-			simplelink._dep = src[reqs[i][0]].getRequires()[i];
+			simplelink._dep = src[index].getRequires()[i];
 			simplelink._loop = false;
 
 			_paths.push_back(simplelink);
 		}
 		else
 		{
+			//std::cout << "Working at slot" << std::endl;
 			SlotLink newslot;
 			newslot._slotname = src[index].getRequires()[i];
 			newslot._slotencname = "slot_" + generateName(newslot._slotname);
@@ -213,14 +231,17 @@ void DotExporter::generateFromGraph(Graph src)
 
 	for (int i = 0; i < src.getAmount(); ++i)
 	{
+		std::cout << "Working " << i << " " << src.getAmount() << std::endl;
 		std::vector< std::vector<int> > reqs = src.getRequires(i);
 
 		if (checkSingleSlot(reqs))
 		{
+			//std::cout << "Single" << std::endl;
 			generateLinks(i, transformSingleSlot(reqs), src);
 		}
 		else
 		{
+			//std::cout << "Slot" << std::endl;
 			generateSlotLinks(i, reqs, src);
 		}
 	}
@@ -246,6 +267,8 @@ void DotExporter::save()
 		dotfile << "[label=\"" << _names[i] << "\" shape=box]" << std::endl; 
 	}
 
+	//std::cout << "Completed names" << std::endl;
+
 	if (!_slotIgnore)
 	{
 		dotfile << std::endl << "// Slot connectors" << std::endl;
@@ -257,6 +280,8 @@ void DotExporter::save()
 			dotfile << "[label=\"" << _slotpaths[i]._slotname << "\" shape=circle]" << std::endl; 
 		}
 	}
+
+	//std::cout << "Completed slot connectors" << std::endl;
 
 	dotfile << std::endl << "// Graph links" << std::endl;
 
