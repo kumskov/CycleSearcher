@@ -144,30 +144,57 @@ void DotExporter::generateSlotLinks(int index, std::vector< std::vector<int> > r
 		throw std::logic_error("DotExporter: Invalid index (not found previously)");
 	}
 
-	throw std::logic_error("FIX IT");
+	//throw std::logic_error("FIX IT");
 
 	std::string start = _encodednames[index];
+	
 
 	for (int i = 0; i < reqs.size(); ++i)
 	{
-		SlotLink newslot;
-		newslot._slotname = src[index].getRequires()[i];
-		newslot._from = index;
-		newslot._to = reqs[i];
-
-		for (int j = 0; j < reqs[i].size(); ++j)
+		if (reqs[i].size() == 0)
 		{
-			int toindex = reqs[i][j];
+			//Mark broken here
+			continue;
+		}
+		if (reqs[i].size() == 1)
+		{
+			int toindex = reqs[i][0];
 			std::string end = _encodednames[toindex];
 
-			std::string newpath;
-			newpath = newslot._slotname + " -> " + end;
+			Link simplelink;
+			simplelink._path = start + " -> " + end;
+			simplelink._from = index;
+			simplelink._to = toindex;
+			simplelink._dep = src[reqs[i][0]].getRequires()[i];
+			simplelink._loop = false;
 
-			newslot._paths.push_back(newpath);
-			newslot._loop.push_back(false);
+			_paths.push_back(simplelink);
 		}
+		else
+		{
+			SlotLink newslot;
+			newslot._slotname = src[index].getRequires()[i];
+			newslot._slotencname = "slot_" + generateName(newslot._slotname);
+			newslot._from = index;
+			newslot._to = reqs[i];
 
-		_slotpaths.push_back(newslot);
+			//std::string connector = src[reqs[i]].getRequires()[i];
+			newslot._link = start + " -> " + newslot._slotname;
+
+			for (int j = 0; j < reqs[i].size(); ++j)
+			{
+				int toindex = reqs[i][j];
+				std::string end = _encodednames[toindex];
+
+				std::string newpath;
+				newpath = newslot._slotname + " -> " + end;
+
+				newslot._paths.push_back(newpath);
+				newslot._loop.push_back(false);
+			}
+
+			_slotpaths.push_back(newslot);
+		}
 	}
 }
 
@@ -215,12 +242,12 @@ void DotExporter::save()
 
 	if (!_slotIgnore)
 	{
-		dotfile << std::endl << "// Slot nodes" << std::endl;
+		dotfile << std::endl << "// Slot connectors" << std::endl;
 
 		for (int i = 0; i < _slotpaths.size(); ++i)
 		{
 			dotfile << "\t";
-			dotfile << "slot_" + generateName(_slotpaths[i]._slotname) + " ";
+			dotfile << _slotpaths[i]._slotencname << " ";
 			dotfile << "[label=\"" << _slotpaths[i]._slotname << "\" shape=circle]" << std::endl; 
 		}
 	}
@@ -246,8 +273,24 @@ void DotExporter::save()
 
 		for (int i = 0; i < _slotpaths.size(); ++i)
 		{
-			//dotfile << "\t";
-			throw std::logic_error("DotExporter: save is unfinished, slot links");
+			dotfile << "//Link from main node to a connector" << std::endl;
+			dotfile << "\t";
+			dotfile << _slotpaths[i]._link << std::endl;
+
+			dotfile << "//Links from connector to all dependecies" << std::endl;
+			dotfile << "\t";
+			for (int j = 0; j < _slotpaths[i]._paths.size(); ++j)
+			{
+				dotfile << "\t" << std::endl;
+				dotfile << _slotpaths[i]._paths[j] << std::endl;
+				dotfile << " [";
+				if (_slotpaths[i]._loop[j])
+				{
+					dotfile << "color=red ";
+				}
+				dotfile << "\"]" << std::endl;
+			}
+			//throw std::logic_error("DotExporter: save is unfinished, slot links");
 		}
 	}
 
