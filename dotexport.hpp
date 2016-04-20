@@ -23,6 +23,8 @@ protected:
 	{
 		std::vector<std::string> _paths;
 		std::string _slotname;
+		std::string _slotencname;
+		std::string _link;
 		int _from;
 		std::vector<int> _to;
 		std::vector<bool> _loop;
