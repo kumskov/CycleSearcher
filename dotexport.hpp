@@ -55,6 +55,10 @@ protected:
 	void generateLinks(int, std::vector<int>, Graph);
 	void generateSlotLinks(int, std::vector< std::vector<int> >, Graph);
 
+	int findSelfLink(int);
+	int findLink(int, int);
+	int findSlot(int, int);
+
 public:
 	DotExporter();
 	DotExporter(std::string name);
