@@ -463,7 +463,7 @@ void Graph::load(std::string flname)
 	fl.close();
 }
 
-std::vector<int> getProvides(int index) const
+std::vector<int> Graph::getProvides(int index) const
 {
 	if ((index >= _ingraph.size()) ||
 		(index < 0))
@@ -474,7 +474,7 @@ std::vector<int> getProvides(int index) const
 	return _ingraph[index]._providesFor;
 }
 
-std::vector< std::vector<int> > getRequires(int index) const
+std::vector< std::vector<int> > Graph::getRequires(int index) const
 {
 	if ((index >= _ingraph.size()) ||
 		(index < 0))
@@ -483,7 +483,7 @@ std::vector< std::vector<int> > getRequires(int index) const
 	}
 
 	std::vector< std::vector<int> > ret;
-	for (int i = 0; i < _ingraph[index]._requires.size())
+	for (int i = 0; i < _ingraph[index]._requires.size(); ++i)
 	{
 		ret.push_back(_ingraph[index]._requires[i]._possibleMatch);
 	}
