@@ -116,7 +116,7 @@ void Graph::fillRequires()
 		}
 		else
 		{
-			//std::cout << "Req " << i << ": All Good!" << std::endl;
+			std::cout << "Req " << i << ": All Good!" << std::endl;
 		}
 	}
 }
@@ -158,7 +158,7 @@ void Graph::fillProvidesFor()
 				*/
 			}
 		}
-		//std::cout << "Prov " << i << ": done\n";
+		std::cout << "Prov " << i << ": done\n";
 	}
 }
 
