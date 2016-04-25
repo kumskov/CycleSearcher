@@ -242,7 +242,7 @@ void DotExporter::generateFromGraph(Graph src)
 		addPackage(src[i]);
 	}
 
-	for (int i = 5755; i < src.getAmount(); ++i)
+	for (int i = 0; i < src.getAmount(); ++i)
 	{
 		std::cout << "Working " << i << " " << src.getAmount() << std::endl;
 		std::vector< std::vector<int> > reqs = src.getRequires(i);

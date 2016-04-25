@@ -216,7 +216,7 @@ void dotexporter(std::string flsrc, std::string flexp)
 	result = std::time(nullptr);
 	std::cout << "Filtered: \t" << std::asctime(std::localtime(&result));
 	
-	DotExporter testexport("Fedora repo", flexp);
+	DotExporter testexport("FedoraRepo", flexp);
 
 	testexport.generateFromGraph(worker);
 
