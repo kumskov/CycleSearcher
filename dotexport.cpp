@@ -182,6 +182,7 @@ void DotExporter::generateSlotLinks(int index, std::vector< std::vector<int> > r
 		//std::cout << "Slot size: " << reqs[i].size() << std::endl;
 		if (reqs[i].size() == 0)
 		{
+			//std::cout << "Broken" << std::endl;
 			//Mark broken here
 			continue;
 		}
@@ -189,6 +190,11 @@ void DotExporter::generateSlotLinks(int index, std::vector< std::vector<int> > r
 		{
 			//std::cout << "Working at simple" << std::endl;
 			int toindex = reqs[i][0];
+			if (reqs[i][0] == -1)
+			{
+				//Another broken here
+				continue;
+			}
 			std::string end = _encodednames[toindex];
 
 			Link simplelink;
@@ -236,7 +242,7 @@ void DotExporter::generateFromGraph(Graph src)
 		addPackage(src[i]);
 	}
 
-	for (int i = 0; i < src.getAmount(); ++i)
+	for (int i = 5755; i < src.getAmount(); ++i)
 	{
 		std::cout << "Working " << i << " " << src.getAmount() << std::endl;
 		std::vector< std::vector<int> > reqs = src.getRequires(i);
