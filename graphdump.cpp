@@ -223,6 +223,11 @@ void dotexporter(std::string flsrc, std::string flexp)
 	result = std::time(nullptr);
 	std::cout << "Generated export: \t" << std::asctime(std::localtime(&result));
 
+	testexport.markCycles(data);
+
+	result = std::time(nullptr);
+	std::cout << "Marked cycles: \t" << std::asctime(std::localtime(&result));
+
 	testexport.save();
 
 	result = std::time(nullptr);
