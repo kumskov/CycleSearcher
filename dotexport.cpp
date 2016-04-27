@@ -244,7 +244,7 @@ void DotExporter::generateFromGraph(Graph src)
 
 	for (int i = 0; i < src.getAmount(); ++i)
 	{
-		std::cout << "Working " << i << " " << src.getAmount() << std::endl;
+		std::cout << "Working on " << i << " out of " << src.getAmount() << std::endl;
 		std::vector< std::vector<int> > reqs = src.getRequires(i);
 
 		if (checkSingleSlot(reqs))
@@ -314,20 +314,26 @@ int DotExporter::findSlot(int start, int end)
 void DotExporter::markCycles(CycleContainer src)
 {
 	std::vector<int> selfcycles = src.getSelfCycles();
+	std::cout << "Working on selfcycles" << std::endl;
 
 	for (int i = 0; i < selfcycles.size(); ++i)
-	{
+	{	
+		std::cout << "Selfcycle: " << i << " out of " << selfcycles.size() << std::endl;
 		int found = findSelfLink(selfcycles[i]);
 		if (found == -1)
 		{
 			throw std::logic_error("DotExporter: Could not find selfcycle");
 		}
+		//_paths[found]._loop = true;
 	}
 
 	std::vector< std::vector<int> > cycles = src.getCycles();
+	std::cout << "Working on cycles" << std::endl;
 
 	for (int i = 0; i < cycles.size(); ++i)
 	{
+		std::cout << "Cycle: " << i << " out of " << cycles.size() << std::endl;
+		
 		for (int j = cycles[i].size() - 1; j > 0; --j)
 		{
 			int found = findLink(cycles[i][j], cycles[i][j-1]);
@@ -338,17 +344,21 @@ void DotExporter::markCycles(CycleContainer src)
 				{
 					throw std::logic_error("DotExporter: Could not find cycle");
 				}
+				//_slotpaths[found]
 			}
 		}
 	}
 
 	int filters = src.getFilterAmount();
+	std::cout << "Working on filtered cycles" << std::endl;
 
 	for (int i = 0; i < filters; ++i)
 	{
+		std::cout << "Filter <" << src.getFilterParameter(i) << ">: " << i << " out of " << filters << std::endl;
 		std::vector< std::vector<int> > fcycles = src.getFilteredCycle(i);
 		for (int j = 0; j < fcycles.size(); ++j)
 		{
+			std::cout << "Filter " << i << ": " << j << " out of " << fcycles.size() << std::endl;
 			for (int k = cycles[j].size() - 1; k > 0; --k)
 			{
 				int found = findLink(cycles[j][k], cycles[j][k-1]);
@@ -425,7 +435,7 @@ void DotExporter::save()
 			//dotfile << "\t";
 			for (int j = 0; j < _slotpaths[i]._paths.size(); ++j)
 			{
-				dotfile << "\t" << std::endl;
+				dotfile << "\t";
 				dotfile << _slotpaths[i]._paths[j];
 				dotfile << " [";
 				if (_slotpaths[i]._loop[j])
