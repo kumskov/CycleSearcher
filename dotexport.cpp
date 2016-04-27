@@ -24,13 +24,23 @@ void DotExporter::addPackage(Package pkg)
 std::string DotExporter::generateName(std::string str)
 {
 	std::string ret;
-	if (str.length() > 3)
+	int cnt = 0;
+	int i = 0;
+	while(cnt < 3)
 	{
-		ret += str.substr(0, 3) + "_";
-	}
-	else
-	{
-		ret += str + "_";
+		if (i >= str.size())
+		{
+			ret += 'z';
+			continue;
+		}
+
+		if (((str[i] >= 'a') && (str[i] <= 'z')) ||
+			((str[i] >= 'A') && (str[i] <= 'Z')))
+		{
+			ret += str[i];
+		}
+
+		i++;
 	}
 
 	ret += std::to_string(_intcounter++);
@@ -211,7 +221,7 @@ void DotExporter::generateSlotLinks(int index, std::vector< std::vector<int> > r
 			//std::cout << "Working at slot" << std::endl;
 			SlotLink newslot;
 			newslot._slotname = src[index].getRequires()[i];
-			newslot._slotencname = "slot_" + generateName(newslot._slotname);
+			newslot._slotencname = "SLOT" + generateName(newslot._slotname);
 			newslot._from = index;
 			newslot._to = reqs[i];
 
