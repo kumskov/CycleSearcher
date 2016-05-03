@@ -4,7 +4,9 @@
 #include "graph.hpp"
 #include "cyclesearcher.hpp"
 #include "cyclecontainer.hpp"
-#include "dotexport.hpp"
+#include "parser.hpp"
+#include "exporter.hpp"
+#include "exporterfactory.hpp"
 #include <iostream>
 #include <ctime>
 
@@ -16,6 +18,7 @@ void usageHelp()
 	std::cout << "\t./graphdump fix <source file> <target file>" << std::endl;
 	std::cout << "\t./graphdump cycle <source file>" << std::endl;
 	std::cout << "\t./graphdump dotexport <source file> <target file>" << std::endl;
+	std::cout << "\t./graphdump libtest <library file>" << std::endl;
 }
 
 void exporter(std::string flsrc, std::string flexp)
@@ -190,6 +193,7 @@ void cycler(std::string flname)
 
 void dotexporter(std::string flsrc, std::string flexp)
 {
+	/*
 	std::time_t result = std::time(nullptr);
 	std::cout << "Starting: \t" << std::asctime(std::localtime(&result));
 
@@ -216,22 +220,38 @@ void dotexporter(std::string flsrc, std::string flexp)
 	result = std::time(nullptr);
 	std::cout << "Filtered: \t" << std::asctime(std::localtime(&result));
 	
-	DotExporter testexport("FedoraRepo", flexp);
+	Exporter* testexport = new DotExporter();
+	//DotExporter testexport("FedoraRepo", flexp);
+	testexport->setFile(flexp);
+	testexport->setName("FedoraRepo");
 
-	testexport.generateFromGraph(worker);
+	testexport->generateFromGraph(worker);
 
 	result = std::time(nullptr);
 	std::cout << "Generated export: \t" << std::asctime(std::localtime(&result));
 
-	testexport.markCycles(data);
+	testexport->markCycles(data);
 
 	result = std::time(nullptr);
 	std::cout << "Marked cycles: \t" << std::asctime(std::localtime(&result));
 
-	testexport.save();
+	testexport->save();
 
 	result = std::time(nullptr);
 	std::cout << "Finished: \t" << std::asctime(std::localtime(&result));
+
+	delete testexport;
+	*/
+}
+
+void libtest(std::string flname)
+{
+	ExpFactory f;
+	f.load(flname);
+
+	Exporter* test = f.getExporter();
+	std::cout << "Factory says it's name is: " << f.getName(0) << std::endl;
+	std::cout << "And in reality it's name is: " << test->getClassName() << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -279,6 +299,11 @@ int main(int argc, char** argv)
 	if (option == "cycle")
 	{
 		cycler(fl);
+		return 0;
+	}
+	if (option == "libtest")
+	{
+		libtest(fl);
 		return 0;
 	}
 	if (option == "fix")
