@@ -4,10 +4,11 @@
 #include "package.hpp"
 #include "graph.hpp"
 #include "cyclecontainer.hpp"
+#include "exporter.hpp"
 #include <fstream>
 
 
-class DotExporter
+class DotExporter : public Exporter
 {
 protected:
 	struct Link
@@ -45,11 +46,11 @@ protected:
 
 	std::string _graphname;
 
-	int findName(std::string) const;
+	int findName(std::string);
 	std::string generateName(std::string);
 
-	std::vector<int> transformSingleSlot(std::vector< std::vector<int> >) const;
-	bool checkSingleSlot(std::vector< std::vector<int> >) const;
+	std::vector<int> transformSingleSlot(std::vector< std::vector<int> >);
+	bool checkSingleSlot(std::vector< std::vector<int> >);
 
 	void addPackage(Package);
 	void generateLinks(int, std::vector<int>, Graph);
@@ -67,18 +68,21 @@ public:
 	void setFile(std::string);
 
 	void setSlotIgnore(bool);
-	bool getSlotIgnore() const;
+	bool getSlotIgnore();
 
 	void setMarkBroken(bool);
-	bool getMarkBroken() const;
+	bool getMarkBroken();
 
 	void setName(std::string);
-	std::string getName() const;
+	std::string getName();
 
 	void generateFromGraph(Graph);
 	void markCycles(CycleContainer);
 
 	void save();
+
+	std::string getClassName();
+	std::string getClassDescription();
 
 };
 

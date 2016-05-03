@@ -31,6 +31,7 @@ std::string DotExporter::generateName(std::string str)
 		if (i >= str.size())
 		{
 			ret += 'z';
+			cnt++;
 			continue;
 		}
 
@@ -38,6 +39,7 @@ std::string DotExporter::generateName(std::string str)
 			((str[i] >= 'A') && (str[i] <= 'Z')))
 		{
 			ret += str[i];
+			cnt++;
 		}
 
 		i++;
@@ -48,7 +50,7 @@ std::string DotExporter::generateName(std::string str)
 	return ret;
 }
 
-int DotExporter::findName(std::string name) const
+int DotExporter::findName(std::string name)
 {
 	for (int i = 0; i < _names.size(); ++i)
 	{
@@ -71,7 +73,7 @@ void DotExporter::setSlotIgnore(bool mark)
 	_slotIgnore = mark;
 }
 
-bool DotExporter::getSlotIgnore() const
+bool DotExporter::getSlotIgnore()
 {
 	return _slotIgnore;
 }
@@ -81,7 +83,7 @@ void DotExporter::setMarkBroken(bool mark)
 	_markBroken = mark;
 }
 
-bool DotExporter::getMarkBroken() const
+bool DotExporter::getMarkBroken()
 {
 	return _markBroken;
 }
@@ -91,12 +93,12 @@ void DotExporter::setName(std::string name)
 	_graphname = name;
 }
 
-std::string DotExporter::getName() const
+std::string DotExporter::getName()
 {
 	return _graphname;
 }
 
-bool DotExporter::checkSingleSlot(std::vector< std::vector<int> > reqs) const
+bool DotExporter::checkSingleSlot(std::vector< std::vector<int> > reqs)
 {
 	//for (int i = 0; i < reqs.size(); ++i)
 	//{
@@ -116,7 +118,7 @@ bool DotExporter::checkSingleSlot(std::vector< std::vector<int> > reqs) const
 	return true;
 }
 
-std::vector<int> DotExporter::transformSingleSlot(std::vector< std::vector<int> > src) const
+std::vector<int> DotExporter::transformSingleSlot(std::vector< std::vector<int> > src)
 {
 	std::vector<int> ret;
 	if (!checkSingleSlot(src))
@@ -249,6 +251,7 @@ void DotExporter::generateFromGraph(Graph src)
 {
 	for (int i = 0; i < src.getAmount(); ++i)
 	{
+		std::cout << i << " out of " << src.getAmount() << std::endl;
 		addPackage(src[i]);
 	}
 
@@ -464,3 +467,18 @@ void DotExporter::save()
 
 }
 
+std::string DotExporter::getClassName()
+{
+	return "GraphViz/Dot Exporter";
+}
+
+std::string DotExporter::getClassDescription()
+{
+	return "Can't work with large graphs";
+}
+
+//dlopen hook
+extern "C" Exporter* getExporter()
+{
+	return new DotExporter;
+}
