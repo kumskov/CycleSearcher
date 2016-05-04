@@ -44,6 +44,7 @@ public:
 
 	void load(std::string libname)
 	{
+		//std::cout << libname << std::endl;
 		if (!_handleset)
 		{
 			throw std::runtime_error("LibFactory: Handle is not set!");
@@ -53,6 +54,8 @@ public:
 		{
 			return;
 		}
+
+		libname = "./" + libname;
 
 		void* newhandle = dlopen(libname.c_str(), RTLD_NOW);
 		if (!newhandle)
@@ -73,6 +76,27 @@ public:
 		_current = _expTypes.size() - 1;
 	}
 
+	void unload(int sel)
+	{
+		if (!_handleset)
+		{
+			throw std::runtime_error("LibFactory: Handle is not set!");
+		}
+
+		if ((sel < 0) || (sel > _expTypes.size()))
+		{
+			throw std::logic_error("LibFactory: Invalid current selection");
+		}
+
+		dlclose(_handles[sel]);
+
+		_expTypes.erase(_expTypes.begin()+sel);
+		_handles.erase(_handles.begin()+sel);
+		_libnames.erase(_libnames.begin()+sel);
+
+		_current = -1;
+	}
+
 	void setSymbol(std::string newhandle)
 	{
 		if (!_handleset)
@@ -86,7 +110,7 @@ public:
 	{
 		if (!_handleset)
 		{
-			throw std::runtime_error("LibFactory: Library is not set!");
+			throw std::runtime_error("LibFactory: Handle is not set!");
 		}
 
 		if ((_current < 0) || (_current > _expTypes.size()))
@@ -101,7 +125,7 @@ public:
 	{
 		if (!_handleset)
 		{
-			throw std::runtime_error("LibFactory: Library is not set!");
+			throw std::runtime_error("LibFactory: Handle is not set!");
 		}
 
 		if ((sel < 0) || (sel > _expTypes.size()))
@@ -116,7 +140,7 @@ public:
 	{
 		if (!_handleset)
 		{
-			throw std::runtime_error("LibFactory: Library is not set!");
+			throw std::runtime_error("LibFactory: Handle is not set!");
 		}
 
 		if ((sel < 0) || (sel > _expTypes.size()))
@@ -135,6 +159,34 @@ public:
 	int getAmount() const
 	{
 		return _expTypes.size();
+	}
+
+	std::string getLibraryPath(int sel) const
+	{
+		if (!_handleset)
+		{
+			throw std::runtime_error("LibFactory: Handle is not set!");
+		}
+
+		if ((sel < 0) || (sel > _expTypes.size()))
+		{
+			throw std::logic_error("LibFactory: Invalid selection");
+		}
+
+		return _libnames[sel];
+	}
+
+	int find(std::string libname) const
+	{
+		for (int i = 0; i < _libnames.size(); ++i)
+		{
+			if (_libnames[i] == libname)
+			{
+				return i;
+			}
+		}
+
+		return -1;
 	}
 };
 
