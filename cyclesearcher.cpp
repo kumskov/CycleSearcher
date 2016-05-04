@@ -124,6 +124,9 @@ void CycleSearcher::findCycles()
 	if (_ingraph.size() == 0)
 		throw std::logic_error("CycleSearcher: Need to build graph first!");
 
+	_visited.clear();
+	_selfcycle.clear();
+	_cyclepath.clear();
 
 	for (int i = 0; i < _ingraph.size(); ++i)
 	{
