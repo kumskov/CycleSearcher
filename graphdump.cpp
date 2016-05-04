@@ -240,6 +240,7 @@ void dotexporter(std::string flsrc, std::string flexp, std::string fllib)
 	testexport->setName("FedoraRepo");
 
 	testexport->generateFromGraph(worker);
+	std::cout << std::endl;
 
 	result = std::time(nullptr);
 	std::cout << "Generated export: \t" << std::asctime(std::localtime(&result));
