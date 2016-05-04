@@ -1,4 +1,5 @@
 #include "graph.hpp"
+#include "utils.hpp"
 
 
 //##################################################//
@@ -116,7 +117,8 @@ void Graph::fillRequires()
 		}
 		else
 		{
-			std::cout << "Req " << i << ": All Good!" << std::endl;
+			std::cout	<< "Reqs:\t" << i << "/" << _ingraph.size() \
+						<< '\t' << Utils::processString(i, _ingraph.size(), 22) << '\r';
 		}
 	}
 }
@@ -158,7 +160,8 @@ void Graph::fillProvidesFor()
 				*/
 			}
 		}
-		std::cout << "Prov " << i << ": done\n";
+		std::cout	<< "Prov:\t" << i << "/" << _ingraph.size() \
+						<< '\t' << Utils::processString(i, _ingraph.size(), 22) << '\r';
 	}
 }
 
