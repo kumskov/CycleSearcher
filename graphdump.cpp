@@ -6,7 +6,8 @@
 #include "cyclecontainer.hpp"
 #include "parser.hpp"
 #include "exporter.hpp"
-#include "exporterfactory.hpp"
+#include "templatefactory.hpp"
+//#include "exporterfactory.hpp"
 #include <iostream>
 #include <ctime>
 
@@ -14,35 +15,43 @@
 void usageHelp()
 {
 	std::cout << "Usage:\t./graphdump import <target file>" << std::endl;
-	std::cout << "\t./graphdump export <source file> <target file>" << std::endl;
+	std::cout << "\t./graphdump export <source file> <target file> <library file>" << std::endl;
 	std::cout << "\t./graphdump fix <source file> <target file>" << std::endl;
 	std::cout << "\t./graphdump cycle <source file>" << std::endl;
 	std::cout << "\t./graphdump dotexport <source file> <target file>" << std::endl;
 	std::cout << "\t./graphdump libtest <library file>" << std::endl;
 }
 
-void exporter(std::string flsrc, std::string flexp)
+void exporter(std::string flsrc, std::string flexp, std::string lib)
 {
-	Parser p(flsrc);
+	LibFactory<Parser> f;
+	f.setSymbol("getParser");
+	f.load(lib);
+	
+	Parser* p = f.getObject();
+
+	p->load(flsrc);
 
 	std::time_t result = std::time(nullptr);
 	std::cout << "Starting: \t" << std::asctime(std::localtime(&result));
 
-	p.parse();
+	p->parse();
 
-	int size = p.getAmountOfPackages();
+	int size = p->getAmountOfPackages();
 
-	Container c = p.getContainer();
+	Container c = p->getContainer();
 	std::cout << "Amount of elements:" << size << std::endl;
 
 	Graph test;
 
-	test.buildGraph(p.getContainer());
+	test.buildGraph(p->getContainer());
 
 	test.save(flexp);
 
 	result = std::time(nullptr);
 	std::cout << "Finished: \t" << std::asctime(std::localtime(&result));
+
+	delete p;
 }
 
 void importerHelp()
@@ -191,9 +200,9 @@ void cycler(std::string flname)
 	}
 }
 
-void dotexporter(std::string flsrc, std::string flexp)
+void dotexporter(std::string flsrc, std::string flexp, std::string fllib)
 {
-	/*
+	
 	std::time_t result = std::time(nullptr);
 	std::cout << "Starting: \t" << std::asctime(std::localtime(&result));
 
@@ -220,7 +229,12 @@ void dotexporter(std::string flsrc, std::string flexp)
 	result = std::time(nullptr);
 	std::cout << "Filtered: \t" << std::asctime(std::localtime(&result));
 	
-	Exporter* testexport = new DotExporter();
+	LibFactory<Exporter> expfact;
+	
+	expfact.setSymbol("getExporter");
+	expfact.load(fllib);
+
+	Exporter* testexport = expfact.getObject();
 	//DotExporter testexport("FedoraRepo", flexp);
 	testexport->setFile(flexp);
 	testexport->setName("FedoraRepo");
@@ -241,17 +255,19 @@ void dotexporter(std::string flsrc, std::string flexp)
 	std::cout << "Finished: \t" << std::asctime(std::localtime(&result));
 
 	delete testexport;
-	*/
+	
 }
 
 void libtest(std::string flname)
 {
-	ExpFactory f;
+	//ExpFactory f;
+	LibFactory<Exporter> f;
+	f.setSymbol("getExporter");
 	f.load(flname);
 
-	Exporter* test = f.getExporter();
-	std::cout << "Factory says it's name is: " << f.getName(0) << std::endl;
-	std::cout << "And in reality it's name is: " << test->getClassName() << std::endl;
+	Exporter* test = f.getObject();
+	//std::cout << "Factory says it's name is: " << f.getName(0) << std::endl;
+	std::cout << "Class name is: " << test->getClassName() << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -267,7 +283,7 @@ int main(int argc, char** argv)
 
 	if (option == "export")
 	{
-		if (argc != 4)
+		if (argc != 5)
 		{
 			std::cout << "Not enough parameters!" << std::endl;
 			usageHelp();
@@ -275,12 +291,13 @@ int main(int argc, char** argv)
 		}
 
 		std::string flexp = argv[3];
-		exporter(fl, flexp);
+		std::string fllib = argv[4];
+		exporter(fl, flexp, fllib);
 		return 0;
 	}
 	if (option == "dotexport")
 	{
-		if (argc != 4)
+		if (argc != 5)
 		{
 			std::cout << "Not enough parameters!" << std::endl;
 			usageHelp();
@@ -288,7 +305,8 @@ int main(int argc, char** argv)
 		}
 
 		std::string flexp = argv[3];
-		dotexporter(fl, flexp);
+		std::string fllib = argv[4];
+		dotexporter(fl, flexp, fllib);
 		return 0;
 	}
 	if (option == "import")
