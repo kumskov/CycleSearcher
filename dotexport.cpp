@@ -1,5 +1,7 @@
 #include "dotexport.hpp"
 
+
+
 DotExporter::DotExporter() {}
 
 DotExporter::DotExporter(std::string name)
@@ -251,13 +253,15 @@ void DotExporter::generateFromGraph(Graph src)
 {
 	for (int i = 0; i < src.getAmount(); ++i)
 	{
-		std::cout << i << " out of " << src.getAmount() << std::endl;
+		//std::cout << i << " out of " << src.getAmount() << std::endl;
 		addPackage(src[i]);
 	}
 
 	for (int i = 0; i < src.getAmount(); ++i)
 	{
-		std::cout << "Working on " << i << " out of " << src.getAmount() << std::endl;
+		std::cout	<< "Export:\t" << i << "/" << src.getAmount() \
+					<< '\t' << Utils::processString(i, src.getAmount(), 22) << '\r';
+		//std::cout << "Working on " << i << " out of " << src.getAmount() << std::endl;
 		std::vector< std::vector<int> > reqs = src.getRequires(i);
 
 		if (checkSingleSlot(reqs))

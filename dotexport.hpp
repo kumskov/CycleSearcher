@@ -5,6 +5,7 @@
 #include "graph.hpp"
 #include "cyclecontainer.hpp"
 #include "exporter.hpp"
+#include "utils.hpp"
 #include <fstream>
 
 
