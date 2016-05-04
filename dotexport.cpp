@@ -331,11 +331,11 @@ int DotExporter::findSlot(int start, int end)
 void DotExporter::markCycles(CycleContainer src)
 {
 	std::vector<int> selfcycles = src.getSelfCycles();
-	std::cout << "Working on selfcycles" << std::endl;
+	//std::cout << "Working on selfcycles" << std::endl;
 
 	for (int i = 0; i < selfcycles.size(); ++i)
 	{	
-		std::cout << "Selfcycle: " << i << " out of " << selfcycles.size() << std::endl;
+		//std::cout << "Selfcycle: " << i << " out of " << selfcycles.size() << std::endl;
 		int found = findSelfLink(selfcycles[i]);
 		if (found == -1)
 		{
@@ -345,11 +345,11 @@ void DotExporter::markCycles(CycleContainer src)
 	}
 
 	std::vector< std::vector<int> > cycles = src.getCycles();
-	std::cout << "Working on cycles" << std::endl;
+	//std::cout << "Working on cycles" << std::endl;
 
 	for (int i = 0; i < cycles.size(); ++i)
 	{
-		std::cout << "Cycle: " << i << " out of " << cycles.size() << std::endl;
+		//std::cout << "Cycle: " << i << " out of " << cycles.size() << std::endl;
 		
 		for (int j = cycles[i].size() - 1; j > 0; --j)
 		{
@@ -367,15 +367,15 @@ void DotExporter::markCycles(CycleContainer src)
 	}
 
 	int filters = src.getFilterAmount();
-	std::cout << "Working on filtered cycles" << std::endl;
+	//std::cout << "Working on filtered cycles" << std::endl;
 
 	for (int i = 0; i < filters; ++i)
 	{
-		std::cout << "Filter <" << src.getFilterParameter(i) << ">: " << i << " out of " << filters << std::endl;
+		//std::cout << "Filter <" << src.getFilterParameter(i) << ">: " << i << " out of " << filters << std::endl;
 		std::vector< std::vector<int> > fcycles = src.getFilteredCycle(i);
 		for (int j = 0; j < fcycles.size(); ++j)
 		{
-			std::cout << "Filter " << i << ": " << j << " out of " << fcycles.size() << std::endl;
+			//std::cout << "Filter " << i << ": " << j << " out of " << fcycles.size() << std::endl;
 			for (int k = cycles[j].size() - 1; k > 0; --k)
 			{
 				int found = findLink(cycles[j][k], cycles[j][k-1]);
