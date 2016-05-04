@@ -1,69 +1,22 @@
-#ifndef __PARSER_HPP__
-#define __PARSER_HPP__
+#ifndef __PARSER_ABSTARCT_HPP__
+#define __PARSER_ABSTARCT_HPP__
 
-
-//Default libs
-#include <fstream>
 #include <string>
-#include <stdexcept>
-#include <vector>
-
-//My libs
 #include "package.hpp"
 #include "container.hpp"
+#include "classinfo.hpp"
 
-//Temporary
-#include <iostream>
-
-
-//Classes
-class InFile
+class Parser : public ClassInfo
 {
-protected:
-	std::string _flname;
-	std::ifstream _fl;
-	bool _initialized;
-	int _backline;
-
 public:
-	InFile();
-	InFile(std::string);
-	InFile(const char*);
-	~InFile();
+	virtual void load(std::string) = 0;
 
-	int getAmountOfLines();
-	std::string getNextLine();
-	void rewindLine();
+	virtual void parse() = 0;
 
-	void open(std::string);
-	void open(const char*);
+	virtual int getAmountOfPackages() = 0;
+	virtual Package getPackage(int) = 0;
+
+	virtual Container getContainer() = 0;
 };
-
-
-class Parser
-{
-protected:
-	InFile _repo;
-	//Isn't needed since packages are kept in the container
-	//std::vector<Package> _pkgs;
-	Container _pkgs;
-	bool _parsed;
-
-	std::vector<std::string> split(std::string, char);
-	std::string cut_version(std::string);
-
-public:
-	Parser(std::string);
-	Parser(const char*);
-	~Parser();
-
-	void parse();
-
-	int getAmountOfPackages() const;
-	Package getPackage(int) const;
-
-	Container getContainer() const;
-};
-
 
 #endif

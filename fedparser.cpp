@@ -1,4 +1,4 @@
-#include "parser.hpp"
+#include "fedparser.hpp"
 
 //##################################################//
 //													//
@@ -108,32 +108,58 @@ void InFile::open(const char* flname)
 	_initialized = true;
 }
 
+void InFile::close()
+{
+	_fl.close();
+	_initialized = false;
+}
+
+bool InFile::isOpened() const
+{
+	return _initialized;
+}
+
 //##################################################//
 //													//
-//						Parser						//
+//						FedParser						//
 //													//
 //##################################################//
 
 //Constructors
-Parser::Parser(std::string flname)
+FedParser::FedParser()
+{
+	//_repo.open(flname);
+	//_pkgs = std::vector<Package>();
+}
+
+FedParser::FedParser(std::string flname)
 {
 	_repo.open(flname);
 	//_pkgs = std::vector<Package>();
 }
 
-Parser::Parser(const char* flname)
+FedParser::FedParser(const char* flname)
 {
 	_repo.open(flname);
 	//_pkgs = std::vector<Package>();
 }
 
-Parser::~Parser()
+FedParser::~FedParser()
 {
 
+}
+
+void FedParser::load(std::string flname)
+{
+	if (_repo.isOpened())
+	{
+		_repo.close();
+	}
+	_repo.open(flname);
 }
 
 //Start working with the file
-void Parser::parse()
+void FedParser::parse()
 {
 	int len = _repo.getAmountOfLines();
 
@@ -251,7 +277,7 @@ void Parser::parse()
 	}
 }
 
-std::vector<std::string> Parser::split(std::string src, char delim)
+std::vector<std::string> FedParser::split(std::string src, char delim)
 {
 	std::vector<std::string> ret;
 
@@ -303,7 +329,7 @@ std::vector<std::string> Parser::split(std::string src, char delim)
 	return ret;
 }
 
-std::string Parser::cut_version(std::string src)
+std::string FedParser::cut_version(std::string src)
 {
 	std::string ret;
 	for (int i = 0; i < src.length(); ++i)
@@ -329,12 +355,12 @@ std::string Parser::cut_version(std::string src)
 	return ret;
 }
 
-Container Parser::getContainer() const
+Container FedParser::getContainer()
 {
 	return _pkgs;
 }
 
-Package Parser::getPackage(int index) const
+Package FedParser::getPackage(int index)
 {
 	if ((index >= _pkgs.size()) ||
 		(index < 0))
@@ -344,8 +370,24 @@ Package Parser::getPackage(int index) const
 	return _pkgs[index];
 }
 
-int Parser::getAmountOfPackages() const
+int FedParser::getAmountOfPackages()
 {
 	return _pkgs.size();
 }
 
+
+std::string FedParser::getClassName()
+{
+	return "Fedora repository parser";
+}
+
+std::string FedParser::getClassDescription()
+{
+	return "Synthesis.hdlist";
+}
+
+//dlopen hook
+extern "C" Parser* getParser()
+{
+	return new FedParser;
+}
