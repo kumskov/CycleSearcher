@@ -5,35 +5,42 @@ SHARED=-shared
 
 SOURCES=	package.cpp \
 			container.cpp \
-			parser.cpp \
 			graph.cpp \
 			cyclesearcher.cpp \
 			cyclecontainer.cpp \
-			exporterfactory.cpp \
-			graphdump.cpp
+			utils.cpp \
+			graphcrunch.cpp
 
 EXPDEPS=	package.cpp \
 			graph.cpp \
 			cyclecontainer.cpp \
 			cyclesearcher.cpp \
+			utils.cpp \
 			container.cpp 
+
+PARSEDEPS=	package.cpp \
+			container.cpp
 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXPOBJ=$(EXPDEPS:.cpp=.o)
+PARSEOBJ=$(PARSEDEPS:.cpp=.o)
 
-BINARIES=graphdump
+BINARIES=graphcrunch
 
 .PHONY: all		\
 		shared 	\
 		clean
 
-all: $(OBJECTS) shared
+all: $(OBJECTS)
 	$(CXX) $(LDFLAGS) $(OBJECTS) -o $(BINARIES)
 
-shared: dotexport.so
+shared: dotexport.so fedparser.so
 
 dotexport.so: $(EXPOBJ)
 	$(CXX) $(SHARED) $(FLAGS) $(EXPOBJ) dotexport.cpp -o dotexport.so
+
+fedparser.so: $(PARSEOBJ)
+	$(CXX) $(SHARED) $(FLAGS) $(PARSEOBJ) fedparser.cpp -o fedparser.so
 
 .cpp.o:
 	$(CXX) $(FLAGS) -c $<
@@ -44,3 +51,4 @@ dotexport.so: $(EXPOBJ)
 clean:
 	rm -f $(BINARIES)
 	rm -f *.o	
+	rm -f *.so
