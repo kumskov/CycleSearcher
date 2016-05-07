@@ -233,7 +233,7 @@ std::string Graph::printInfo(int index) const
 	if ((index >= _ingraph.size()) || (index < 0))
 	{
 		//std::cout << index << std::endl;
-		throw std::logic_error("Graph: Tried to request index higher than amount of elements");
+		throw std::logic_error("Graph: Tried to request invalid index");
 	}
 
 	//debugPrintNodeVectors(index);
