@@ -297,7 +297,7 @@ void loadGraph()
 
 	if (Data.CurrentParser == -1)
 	{
-		std::cout << "load graph: You need to set exporter first!" << std::endl;
+		std::cout << "load graph: You need to set parser first!" << std::endl;
 		return;
 	}
 
@@ -578,7 +578,7 @@ void listExporters()
 {
 	if (Data.ExpFactory.getAmount() == 0)
 	{
-		std::cout << "There are no parsers loaded!" << std::endl;
+		std::cout << "There are no exporters loaded!" << std::endl;
 		return;
 	}
 
@@ -654,6 +654,7 @@ void printIndex()
 	std::string str = Data.Command[2];
 
 	int index = std::stoi(str, nullptr, 10);
+	//std::cout << index << std::endl;
 
 	std::cout << Data.MainGraph->printInfo(index) << std::endl;
 }
@@ -874,13 +875,19 @@ void exportCommand()
 {
 	if (Data.MainGraph == NULL)
 	{
-		std::cout << "dump: Graph has not been loaded yet!" << std::endl;
+		std::cout << "export: Graph has not been loaded yet!" << std::endl;
 		return;
 	}
 
 	if (Data.Command.size() == 1)
 	{
-		std::cout << "dump: invalid amount of parameters" << std::endl;
+		std::cout << "export: invalid amount of parameters" << std::endl;
+		return;
+	}
+
+	if (Data.CurrentExporter == -1)
+	{
+		std::cout << "export: You need to set exporter first!" << std::endl;
 		return;
 	}
 
@@ -899,10 +906,14 @@ void exportCommand()
 	result = std::time(nullptr);
 	std::cout << "Generated graph: \t" << std::asctime(std::localtime(&result));
 
-	result = std::time(nullptr);
-	std::cout << "Marking cycles: \t" << std::asctime(std::localtime(&result));
+	if (Data.MainCycles != NULL)
+	{
+		result = std::time(nullptr);
+		std::cout << "Marking cycles: \t" << std::asctime(std::localtime(&result));
 
-	e->markCycles(*Data.MainCycles);
+		e->markCycles(*Data.MainCycles);
+	}
+	
 
 	e->save();
 
