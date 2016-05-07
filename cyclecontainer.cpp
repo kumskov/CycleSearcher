@@ -87,7 +87,7 @@ std::string CycleContainer::cycleToString(int index) const
 	std::vector<int> c = _cycles[index]._path;
 	for (int i = 0; i < c.size(); ++i)
 	{
-		ret += std::to_string(c[i]) + (i != (c.size()-1) ? " -> " : "\n");
+		ret += std::to_string(c[i]) + (i != (c.size()-1) ? " -> " : "");
 	}
 
 	return ret;
