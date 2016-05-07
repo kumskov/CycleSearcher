@@ -117,6 +117,9 @@ void helpPrint()
 	std::cout << "\tindex <int>: print package full info at specified index" << std::endl;
 	std::cout << "\tsimple <int>: print simple package info at index" << std::endl;
 	std::cout << "\tfind <string>: find all packages that have specified string in name" << std::endl;
+	std::cout << "\tcycles amount: print how many cycles have been found" << std::endl;
+	std::cout << "\tcycles index <int>: print cycle at specified index" << std::endl;
+	std::cout << "\tcycles selfindex <int>: print selfcycle at specified index" << std::endl;
 }
 
 void helpDump()
@@ -701,6 +704,87 @@ void printFind()
 	}
 }
 
+void printCycleAmount()
+{
+	if ((!Data.MarkCycles) || (Data.MainCycles == NULL))
+	{
+		std::cout << "Cycles have not been marked, type \"set cycles yes\" in order to mark them" << std::endl;
+		return;
+	}
+	std::cout << "There are " << Data.MainCycles->getCycleAmount() << " cycles and " << Data.MainCycles->getSelfCycleAmount() << " selfcycles in this graph" << std::endl;
+}
+
+void printCycleIndex()
+{
+	if ((!Data.MarkCycles) || (Data.MainCycles == NULL))
+	{
+		std::cout << "Cycles have not been marked, type \"set cycles yes\" in order to mark them" << std::endl;
+		return;
+	}
+
+	if (Data.Command.size() == 3)
+	{
+		std::cout << "print cycles index: invalid amount of parameters" << std::endl;
+		return;
+	}
+
+	std::string str = Data.Command[3];
+
+	int index = std::stoi(str, nullptr, 10);
+
+	std::cout << Data.MainCycles->cycleToString(index) << std::endl;
+}
+
+void printCycleSelfindex()
+{
+	if ((!Data.MarkCycles) || (Data.MainCycles == NULL))
+	{
+		std::cout << "Cycles have not been marked, type \"set cycles yes\" in order to mark them" << std::endl;
+		return;
+	}
+
+	if (Data.Command.size() == 3)
+	{
+		std::cout << "print cycles selfindex: invalid amount of parameters" << std::endl;
+		return;
+	}
+
+	std::string str = Data.Command[3];
+
+	int index = std::stoi(str, nullptr, 10);
+
+	std::cout << index << ": package " << Data.MainCycles->getSelfCycles()[index] << " is cycling at itself" << std::endl;
+}
+
+void printCyclesCommand()
+{
+	if (Data.Command.size() == 2)
+	{
+		std::cout << "print cycles: invalid amount of parameters" << std::endl;
+		return;
+	}
+
+	std::string str = Data.Command[2];
+
+	if (str == "amount")
+	{
+		printCycleAmount();
+		return;
+	}
+	if (str == "index")
+	{
+		printCycleIndex();
+		return;
+	}
+	if (str == "selfindex")
+	{
+		printCycleSelfindex();
+		return;
+	}
+
+	generalHelp(str);
+}
+
 void printCommand()
 {
 	if (Data.Command.size() == 1)
@@ -729,6 +813,11 @@ void printCommand()
 	if (str == "find")
 	{
 		printFind();
+		return;
+	}
+	if (str == "cycles")
+	{
+		printCyclesCommand();
 		return;
 	}
 
