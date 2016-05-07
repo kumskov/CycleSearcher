@@ -61,7 +61,7 @@ void generalHelp(std::string option = "")
 {
 	if (option != "")
 	{
-		std::cout << "Unknown option: \"" << option << "\"" << std::endl;
+		std::cout << "Unknown option or command: \"" << option << "\"" << std::endl;
 	}
 	
 	std::cout << "Type \"help\" to see all available commands" << std::endl;
@@ -444,6 +444,12 @@ void setParser()
 
 	int index = std::stoi(str, nullptr, 10);
 
+	if (((index - 1) < 0) || (index - 1) >= Data.ParseFactory.getAmount())
+	{
+		std::cout << "set parser: No parser at selected index" << std::endl;
+		return;
+	}
+
 	Data.CurrentParser = index - 1;
 }
 
@@ -458,6 +464,12 @@ void setExporter()
 	std::string str = Data.Command[2];
 
 	int index = std::stoi(str, nullptr, 10);
+
+	if (((index - 1) < 0) || (index - 1) >= Data.ExpFactory.getAmount())
+	{
+		std::cout << "set exporter: No exporter at selected index" << std::endl;
+		return;
+	}
 
 	Data.CurrentExporter = index - 1;
 }
