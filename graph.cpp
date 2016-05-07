@@ -198,6 +198,7 @@ const Package& Graph::operator[] (int index) const
 	if ((index >= _ingraph.size()) ||
 		(index < 0))
 	{
+		//std::cout << index << std::endl;
 		throw std::logic_error("Graph: Tried to request invalid index");
 	}
 
@@ -229,8 +230,9 @@ void Graph::debugPrintNodeVectors(int index) const
 
 std::string Graph::printInfo(int index) const
 {
-	if (index >= _ingraph.size())
+	if ((index >= _ingraph.size()) || (index < 0))
 	{
+		//std::cout << index << std::endl;
 		throw std::logic_error("Graph: Tried to request index higher than amount of elements");
 	}
 
@@ -258,6 +260,12 @@ std::string Graph::printInfo(int index) const
 		for (int j = 0; j < _ingraph[index]._requires[i]._possibleMatch.size(); ++j)
 		{
 			int pkgindex = _ingraph[index]._requires[i]._possibleMatch[j];
+			if (pkgindex == -1)
+			{
+				ret += "\t\t NO PACKAGE PROVIDING FOUND\n";
+				continue;
+			}
+			//std::cout << pkgindex << std::endl;
 			ret += "\t\t" + _ingraph[pkgindex]._pkg.getName() + '\n';
 			ret += "\t\t- " + _ingraph[pkgindex]._pkg.getDesc() + '\n';
 		}
