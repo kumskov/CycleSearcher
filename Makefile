@@ -31,7 +31,7 @@ BINARIES=graphcrunch
 		shared 	\
 		clean
 
-all: $(OBJECTS)
+all: $(OBJECTS) shared
 	$(CXX) $(LDFLAGS) $(OBJECTS) -o $(BINARIES)
 
 shared: dotexport.so fedparser.so
