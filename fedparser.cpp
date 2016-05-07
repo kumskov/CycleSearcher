@@ -16,6 +16,10 @@ InFile::InFile(std::string flname)
 {
 	_flname = flname;
 	_fl.open(flname.c_str(), std::ifstream::in);
+	if (_fl.peek() != '@')
+	{
+		throw std::runtime_error("Parser: Not a valid hdlist file!");
+	}
 	_initialized = true;
 }
 
@@ -23,6 +27,10 @@ InFile::InFile(const char* flname)
 {
 	_flname = std::string(flname);
 	_fl.open(flname, std::ifstream::in);
+	if (_fl.peek() != '@')
+	{
+		throw std::runtime_error("Parser: Not a valid hdlist file!");
+	}
 	_initialized = true;
 }
 
@@ -96,6 +104,10 @@ void InFile::open(std::string flname)
 	_fl.open(flname.c_str(), std::ifstream::in);
 	_fl.clear();
 	_fl.seekg(_fl.beg);
+	if (_fl.peek() != '@')
+	{
+		throw std::runtime_error("Parser: Not a valid hdlist file!");
+	}
 	_initialized = true;
 }
 
@@ -105,6 +117,10 @@ void InFile::open(const char* flname)
 	_fl.open(flname, std::ifstream::in);
 	_fl.clear();
 	_fl.seekg(_fl.beg);
+	if (_fl.peek() != '@')
+	{
+		throw std::runtime_error("Parser: Not a valid hdlist file!");
+	}
 	_initialized = true;
 }
 
