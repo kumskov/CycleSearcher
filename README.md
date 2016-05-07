@@ -2,6 +2,8 @@
 
 Use 'make all' to compile everything.
 
-graphdump is used for mostly everything, including tests. It is also self-explanatory.
+graphcrunch has everyting you need, graphdump is outdated, don't bother
 
-export function of graphdump has already been used to generate synt.dump, use it for importer function of graphdump. Cycler function is test for cycle search. It doesn't work properly yet.
+type help in graphcrunch to see what's up
+
+proper readme when this program will have proper interface
