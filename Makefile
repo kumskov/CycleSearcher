@@ -34,7 +34,7 @@ BINARIES=graphcrunch
 all: $(OBJECTS) shared
 	$(CXX) $(LDFLAGS) $(OBJECTS) -o $(BINARIES)
 
-shared: dotexport.so fedparser.so testexport.so
+shared: dotexport.so fedparser.so testexport.so testparser.so
 
 dotexport.so: $(EXPOBJ)
 	$(CXX) $(SHARED) $(FLAGS) $(EXPOBJ) dotexport.cpp -o dotexport.so
@@ -44,6 +44,9 @@ testexport.so: $(EXPOBJ)
 
 fedparser.so: $(PARSEOBJ)
 	$(CXX) $(SHARED) $(FLAGS) $(PARSEOBJ) fedparser.cpp -o fedparser.so
+
+testparser.so: $(PARSEOBJ)
+	$(CXX) $(SHARED) $(FLAGS) $(PARSEOBJ) testparser.cpp -o testparser.so
 
 .cpp.o:
 	$(CXX) $(FLAGS) -c $<
