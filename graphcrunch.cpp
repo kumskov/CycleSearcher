@@ -35,6 +35,7 @@ struct MainData
 	int 						CurrentParser = -1;
 
 	bool 						MarkCycles = false;
+	bool						MarkAll	= false;
 	bool 						Exit = false;
 
 } Data;
@@ -92,6 +93,7 @@ void helpSet()
 	std::cout << "\tparser <int>: set what parser to use" << std::endl;
 	std::cout << "\texporter <int>: set what exporter to use" << std::endl;
 	std::cout << "\tcycles <yes/no>: set whether analyze cycles or not" << std::endl;
+	std::cout << "\tmark <all/one>: mark all links from cycled packages or just one" << std::endl;
 	std::cout << "\tname <string>: set graph name" << std::endl;
 }
 
@@ -306,8 +308,6 @@ void loadGraph()
 
 	Parser* p = Data.ParseFactory.getObject(Data.CurrentParser);
 
-	Data.MainGraph = new CycleSearcher;
-
 	p->load(str);
 
 	p->parse();
@@ -317,6 +317,8 @@ void loadGraph()
 
 	result = std::time(nullptr);
 	std::cout << "Generating:\t" << std::asctime(std::localtime(&result));
+
+	Data.MainGraph = new CycleSearcher;
 
 	Data.MainGraph->buildGraph(p->getContainer());
 
@@ -486,6 +488,12 @@ void setCycles()
 
 	if (str == "yes")
 	{
+		if (Data.MainGraph == NULL)
+		{
+			std::cout << "You need to load graph first!" << std::endl;
+			return;
+		}
+
 		Data.MarkCycles = true;
 		if (Data.MainCycles != NULL)
 		{
@@ -535,6 +543,30 @@ void setName()
 	Data.GraphName = str;
 }
 
+void setMark()
+{
+	if (Data.Command.size() == 2)
+	{
+		std::cout << "set: invalid amount of parameters" << std::endl;
+		return;
+	}
+
+	std::string str = Data.Command[2];
+
+	if (str == "all")
+	{
+		Data.MarkAll = true;
+		return;
+	}
+	if (str == "one")
+	{
+		Data.MarkAll = false;
+		return;
+	}
+
+	std::cout << "set mark: invalid option \"" << str << "\"" << std::endl;
+}
+
 void setCommand()
 {
 	if (Data.Command.size() == 1)
@@ -563,6 +595,11 @@ void setCommand()
 	if (str == "name")
 	{
 		setName();
+		return;
+	}
+	if (str == "mark")
+	{
+		setMark();
 		return;
 	}
 
@@ -598,7 +635,7 @@ void listExporters()
 	{
 		Exporter* e = Data.ExpFactory.getObject(i);
 		std::cout 	<< "#" << i+1 << " [" \
-					<< (i == Data.CurrentExporter ? "CURRENT" : "      ") \
+					<< (i == Data.CurrentExporter ? "CURRENT" : "       ") \
 					<< "]: " << e->getClassName() << std::endl;
 	}
 }
@@ -904,7 +941,7 @@ void exportCommand()
 	}
 
 	std::time_t result = std::time(nullptr);
-	std::cout << "Starting: \t" << std::asctime(std::localtime(&result));
+	std::cout << "Starting export: \t" << std::asctime(std::localtime(&result));
 
 	std::string str = Data.Command[1];
 
@@ -912,6 +949,7 @@ void exportCommand()
 
 	e->setName(Data.GraphName);
 	e->setFile(str);
+	e->setMarkAll(Data.MarkAll);
 	e->generateFromGraph(*Data.MainGraph);
 	clearOutput();
 
@@ -926,6 +964,7 @@ void exportCommand()
 		e->markCycles(*Data.MainCycles);
 	}
 	
+	std::cout << "Finished export: \t" << std::asctime(std::localtime(&result));
 
 	e->save();
 
@@ -1031,7 +1070,6 @@ int main()
 			std::cout << "An error occured: " << ex.what() << std::endl;
 			Data.Command.clear();
 		}
-
 	}
 	
 }
