@@ -42,6 +42,7 @@ protected:
 
 	bool _slotIgnore;
 	bool _markBroken;
+	bool _markAllLinkCycles;
 
 	std::string _fl;
 
@@ -73,6 +74,9 @@ public:
 
 	void setMarkBroken(bool);
 	bool getMarkBroken();
+
+	void setMarkAll(bool);
+	bool getMarkAll();
 
 	void setName(std::string);
 	std::string getName();

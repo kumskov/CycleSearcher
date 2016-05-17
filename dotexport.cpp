@@ -2,19 +2,28 @@
 
 
 
-DotExporter::DotExporter() {}
+DotExporter::DotExporter() 
+{
+	_slotIgnore = false;
+	_markBroken = true;
+	_markAllLinkCycles = false;
+}
 
 DotExporter::DotExporter(std::string name)
 {
 	_graphname = name;
 	_slotIgnore = false;
 	_markBroken = true;
+	_markAllLinkCycles = false;
 }
 
 DotExporter::DotExporter(std::string name, std::string flname)
 {
 	_fl = flname;
 	_graphname = name;
+	_slotIgnore = false;
+	_markBroken = true;
+	_markAllLinkCycles = false;
 }
 
 void DotExporter::addPackage(Package pkg)
@@ -98,6 +107,16 @@ void DotExporter::setName(std::string name)
 std::string DotExporter::getName()
 {
 	return _graphname;
+}
+
+void DotExporter::setMarkAll(bool mark)
+{
+	_markAllLinkCycles = mark;
+}
+
+bool DotExporter::getMarkAll()
+{
+	return _markAllLinkCycles;
 }
 
 bool DotExporter::checkSingleSlot(std::vector< std::vector<int> > reqs)
@@ -297,7 +316,8 @@ int DotExporter::findLink(int start, int end)
 	for (int i = 0; i < _paths.size(); ++i)
 	{
 		if ((_paths[i]._from == start) &&
-			(_paths[i]._to == end))
+			(_paths[i]._to == end) &&
+			(_paths[i]._loop == false))
 		{
 			_paths[i]._loop = true;
 			return i;
@@ -315,7 +335,7 @@ int DotExporter::findSlot(int start, int end)
 		{
 			for (int j = 0; j < _slotpaths[i]._to.size(); ++j)
 			{
-				if (_slotpaths[i]._to[j] == end)
+				if ((_slotpaths[i]._to[j] == end) && (_slotpaths[i]._loop[j] == false))
 				{
 					_slotpaths[i]._loop[j] = true;
 					return i;
@@ -335,6 +355,8 @@ void DotExporter::markCycles(CycleContainer src)
 
 	for (int i = 0; i < selfcycles.size(); ++i)
 	{	
+		std::cout	<< "Cycles:\t" << i << "/" << selfcycles.size() \
+					<< '\t' << Utils::processString(i, selfcycles.size(), 22) << '\r';
 		//std::cout << "Selfcycle: " << i << " out of " << selfcycles.size() << std::endl;
 		int found = findSelfLink(selfcycles[i]);
 		if (found == -1)
@@ -349,19 +371,30 @@ void DotExporter::markCycles(CycleContainer src)
 
 	for (int i = 0; i < cycles.size(); ++i)
 	{
+		std::cout	<< "Cycles:\t" << i << "/" << cycles.size() \
+					<< '\t' << Utils::processString(i, cycles.size(), 22) << '\r';
 		//std::cout << "Cycle: " << i << " out of " << cycles.size() << std::endl;
 		
 		for (int j = cycles[i].size() - 1; j > 0; --j)
 		{
-			int found = findLink(cycles[i][j], cycles[i][j-1]);
-			if (found == -1)
+			//std::cout << "j=" << j << std::endl;
+			if (_markAllLinkCycles)
 			{
-				found = findSlot(cycles[i][j], cycles[i][j-1]);
+				while(findLink(cycles[i][j], cycles[i][j-1]) != -1);
+				while(findSlot(cycles[i][j], cycles[i][j-1]) != -1);
+			}
+			else
+			{
+				int found = findLink(cycles[i][j], cycles[i][j-1]);
 				if (found == -1)
 				{
-					throw std::logic_error("DotExporter: Could not find cycle");
+					found = findSlot(cycles[i][j], cycles[i][j-1]);
+					if (found == -1)
+					{
+						throw std::logic_error("DotExporter: Could not find cycle");
+					}
+					//_slotpaths[found]
 				}
-				//_slotpaths[found]
 			}
 		}
 	}
@@ -378,13 +411,21 @@ void DotExporter::markCycles(CycleContainer src)
 			//std::cout << "Filter " << i << ": " << j << " out of " << fcycles.size() << std::endl;
 			for (int k = cycles[j].size() - 1; k > 0; --k)
 			{
-				int found = findLink(cycles[j][k], cycles[j][k-1]);
-				if (found == -1)
+				if (_markAllLinkCycles)
 				{
-					found = findSlot(cycles[j][k], cycles[j][k-1]);
+					while(findLink(cycles[j][k], cycles[j][k-1]) != -1);
+					while(findSlot(cycles[j][k], cycles[j][k-1]) != -1);
+				}
+				else
+				{
+					int found = findLink(cycles[j][k], cycles[j][k-1]);
 					if (found == -1)
 					{
-						throw std::logic_error("DotExporter: Could not find filtered cycle");
+						found = findSlot(cycles[j][k], cycles[j][k-1]);
+						if (found == -1)
+						{
+							throw std::logic_error("DotExporter: Could not find filtered cycle");
+						}
 					}
 				}
 			}

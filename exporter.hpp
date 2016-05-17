@@ -17,6 +17,9 @@ public:
 	virtual void setMarkBroken(bool) = 0;
 	virtual bool getMarkBroken() = 0;
 
+	virtual void setMarkAll(bool) = 0;
+	virtual bool getMarkAll() = 0;
+
 	virtual void setName(std::string) = 0;
 	virtual std::string getName() = 0;
 
