@@ -28,9 +28,6 @@ protected:
 	Container _pkgs;
 	bool _parsed;
 
-	std::vector<std::string> split(std::string, char);
-	std::string cut_version(std::string);
-
 public:
 	TestParser();
 	TestParser(std::string);
