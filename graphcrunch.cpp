@@ -618,7 +618,7 @@ void listParsers()
 	{
 		Parser* p = Data.ParseFactory.getObject(i);
 		std::cout 	<< "#" << i+1 << " [" \
-					<< (i == Data.CurrentParser ? "CURRENT" : "      ") \
+					<< (i == Data.CurrentParser ? "CURRENT" : "       ") \
 					<< "]: " << p->getClassName() << std::endl;
 	}
 }
