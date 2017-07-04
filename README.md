@@ -2,8 +2,12 @@
 
 Use 'make all' to compile everything.
 
-graphcrunch has everyting you need, graphdump is outdated, don't bother
+graphcrunch has everyting you need, graphdump is outdated
 
-type help in graphcrunch to see what's up
+currently supports only YUM-style repositories (.hdlist info files) import and .dot file export
+
+type help in graphcrunch to see more info
+
+first load a parser and an exporter, then load file
 
 proper readme when this program will have proper interface
